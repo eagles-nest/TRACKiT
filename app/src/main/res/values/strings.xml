@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">TrackIt</string>
+    <string name="login">LOGIN</string>
+    <string name="email">Email Address</string>
+    <string name="emailorUsername">Email Address or Username</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="cpassword">Confirm Password</string>
+    <string name="already_registered">Already registered? Login</string>
+    <string name="dont_have_account">New here? Register</string>
+    <string name="ownPhone">Phone Number</string>
+    <string name="gsmPhone">GSM number</string>
+    <string name="register">CREATE ACCOUNT</string>
+    <string name="forgotPass">Forgot Password?</string>
+    <string name="title_activity_homepage">Homepage</string>
+    <string name="resetPassword">RESET PASSWORD</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_settings">Settings</string>
+    <string name="locate">Locate</string>
+    <string name="history">History</string>
+    <string name="my_account">My Account</string>
+    <string name="logout">Logout</string>
+    <string name="instructions">Click on the top menu icon\n to access the main fuctionalities of the mobile application.\n\nLOCATE retrieves the last known location of the laptop according to our servers\n\nHISTORY shows locations graphically on the map frequented or last detected\n\nMy Account allows you to make changes to your account details \n\nABOUT tells you more about the app and how it works\n\nLOGOUT logs you out of the application</string>
+    <string name="about">About</string>
+    <string name="update_details">UPDATE DETAILS</string>
+    <string name="emailNew">Enter New Email Address</string>
+    <string name="gsmPhoneNew">Enter New GSM Number</string>
+    <string name="ownPhoneNew">Enter New Phone Number</string>
+    <string name="passwordNew">Enter New Password</string>
+    <string name="title_activity_locate">Map</string>
+    <string name="title_activity_history">Map</string>
+</resources>
