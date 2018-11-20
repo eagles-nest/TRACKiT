@@ -241,7 +241,7 @@ public class Homepage extends AppCompatActivity
                 super.onPostExecute(s);
                 //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
                 if(s==null){
-                    Toast.makeText(Homepage.this, "You have no history to display", Toast.LENGTH_LONG).show();
+                    Toast.makeText(Homepage.this, "Y "ou have no history to display", Toast.LENGTH_LONG).show();
                 }else{
                     //you have cordinates
                     try {
