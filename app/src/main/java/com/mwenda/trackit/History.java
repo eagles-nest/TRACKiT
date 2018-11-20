@@ -68,5 +68,12 @@ public class History extends FragmentActivity implements OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLng(loc2));
         mMap.addMarker(new MarkerOptions().position(loc3).title(t3));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(loc3));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc3, 10.0f));
+    }
+    //public void onBackPressed
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
     }
 }
+

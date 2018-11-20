@@ -9,7 +9,7 @@
     <string name="already_registered">Already registered? Login</string>
     <string name="dont_have_account">New here? Register</string>
     <string name="ownPhone">Phone Number</string>
-    <string name="gsmPhone">GSM number</string>
+    <string name="gsmPhone">GSM IMEI Number</string>
     <string name="register">CREATE ACCOUNT</string>
     <string name="forgotPass">Forgot Password?</string>
     <string name="title_activity_homepage">Homepage</string>
@@ -25,7 +25,7 @@
     <string name="about">About</string>
     <string name="update_details">UPDATE DETAILS</string>
     <string name="emailNew">Enter New Email Address</string>
-    <string name="gsmPhoneNew">Enter New GSM Number</string>
+    <string name="gsmPhoneNew">Enter New GSM IMEI Number</string>
     <string name="ownPhoneNew">Enter New Phone Number</string>
     <string name="passwordNew">Enter New Password</string>
     <string name="title_activity_locate">Map</string>

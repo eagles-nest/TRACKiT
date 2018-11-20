@@ -36,7 +36,7 @@ import java.util.ArrayList;
 public class Homepage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private TextView txtUsername;
-    public String userName;
+    public String userName,gsmIMEI;
     //SupportMapFragment sMapFragment;
 
     @Override
@@ -61,8 +61,9 @@ public class Homepage extends AppCompatActivity
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("MyPref",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String username=sharedPreferences.getString("usr_username",null);
+        gsmIMEI=sharedPreferences.getString("usr_gsmIMEI",null);
         userName=username;
-        Toast.makeText(this,username, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,gsmIMEI, Toast.LENGTH_SHORT).show();
 
         txtUsername=(TextView)findViewById(R.id.textViewWelcome);
         txtUsername.setText("Welcome "+username+",\n");
@@ -143,7 +144,7 @@ public class Homepage extends AppCompatActivity
     }
 
     private void getLocation(){
-        getJSON("https://evansmwendaem.000webhostapp.com/locate.php?limit=1");
+        getJSON("https://2db65f43.ngrok.io/locate.php?limit=1&gsmIMEI="+gsmIMEI);
     }
     private void getJSON(final String urlWebService){
         //urlWebService->url containing php script outputting the database data in json format
@@ -157,13 +158,18 @@ public class Homepage extends AppCompatActivity
             @Override
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
-                //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
-                try {
-                    showloc(s);
-                    //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if(s==null){
+                    Toast.makeText(Homepage.this, "You have no co-ordinates to display", Toast.LENGTH_LONG).show();
+                }else{
+                    //you have cordinates
+                    try {
+                        showloc(s);
+                        //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             @Override
@@ -186,7 +192,8 @@ public class Homepage extends AppCompatActivity
                     bufferedReader.close();
                     inputStream.close();
                     //return the read string
-                    return stringBuilder.toString().trim();
+                    String sb = stringBuilder.toString().trim();
+                    return sb;
                 }catch (IOException e) {
                     e.printStackTrace();
                     return null;
@@ -218,7 +225,7 @@ public class Homepage extends AppCompatActivity
 
     //history module
     private void history(){
-        getJSON1("https://evansmwendaem.000webhostapp.com/locate.php?limit=3");
+        getJSON1("https://2db65f43.ngrok.io/locate.php?limit=3");
     }
     private void getJSON1(final String urlWebService){
         //urlWebService->url containing php script outputting the database data in json format
@@ -233,12 +240,17 @@ public class Homepage extends AppCompatActivity
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
                 //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
-                try {
-                    showloc1(s);
-                    //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
+                if(s==null){
+                    Toast.makeText(Homepage.this, "You have no history to display", Toast.LENGTH_LONG).show();
+                }else{
+                    //you have cordinates
+                    try {
+                        showloc1(s);
+                        //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             @Override
@@ -323,8 +335,8 @@ public class Homepage extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent= new Intent(Homepage.this,MainActivity.class);
-                        editor.clear();
-                        editor.commit();
+//                        editor.clear();
+//                        editor.commit();
                         startActivity(intent);
                         finish();
                     }

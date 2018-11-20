@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.widget.Toast;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -17,15 +18,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.sql.Wrapper;
-
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
 * Created by NDANU on 8/15/2018.
@@ -50,10 +46,15 @@ ProgressDialog progressDialog;
         String ownPhone = myWrappers[0].ownPhone;
         String gsmPhone = myWrappers[0].gsmPhone;
 
-        //the URLs
-        String login_url = "https://evansmwendaem.000webhostapp.com/login.php";
-        String reg_url = "https://evansmwendaem.000webhostapp.com/register.php";
-        String update_url = "https://evansmwendaem.000webhostapp.com/update.php";
+        //the URLs    2db65f43.ngrok.io
+//        String login_url = "https://evansmwendaem.000webhostapp.com/login.php";
+//        String reg_url = "https://evansmwendaem.000webhostapp.com/register.php";
+//        String update_url = "https://evansmwendaem.000webhostapp.com/update.php";
+        //ngrok urls
+        String login_url  = "http://2db65f43.ngrok.io/projects/trackit/login.php";
+        String reg_url    = "http://2db65f43.ngrok.io/projects/trackit/register.php";
+        String update_url = "http://2db65f43.ngrok.io/projects/trackit/update.php";
+        String reset_url  = "http://2db65f43.ngrok.io/projects/trackit/reset.php";
 
         if (method.equals("register")) {
             try {
@@ -79,8 +80,9 @@ ProgressDialog progressDialog;
                 while((line = bufferedReader.readLine())!=null){
                     result += line;
                 }
-                MyWrapper w = new MyWrapper("","","","","","","");
+                MyWrapper w = new MyWrapper(method,"","","","",gsmPhone,result);
                 w.result=result;
+                w.gsmPhone=gsmPhone;
                 bufferedReader.close();
                 inputStream.close();
                 httpURLConnection.disconnect();
@@ -163,6 +165,41 @@ ProgressDialog progressDialog;
                 e.printStackTrace();
             }
         }
+        else if(method=="reset"){
+            //update details of signed in user
+            try {
+                URL url = new URL(reset_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoOutput(true);
+                OutputStream os = httpURLConnection.getOutputStream();
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                String data =URLEncoder.encode("email", "UTF-8")+"="+ URLEncoder.encode(email, "UTF-8");
+                bufferedWriter.write(data);
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                os.close();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
+                String result="";
+                String line;
+                while((line = bufferedReader.readLine())!=null){
+                    result += line;
+                }
+                MyWrapper w = new MyWrapper("","","","","","","");
+                w.result=result;
+                w.email=email;
+                bufferedReader.close();
+                inputStream.close();
+                httpURLConnection.disconnect();
+                return w;
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return null;
     }
 
@@ -174,9 +211,12 @@ ProgressDialog progressDialog;
     progressDialog.show();
 
 }
-protected void onPostExecute(MyWrapper w){
-    String result=w.result;
-    String username=w.username;
+protected void onPostExecute(MyWrapper wrapper){
+    String result=wrapper.result;
+    String username=wrapper.username;
+    String gsmIMEI=wrapper.gsmPhone;
+    String usrEmail=wrapper.email;
+    //Toast.makeText(context,result, Toast.LENGTH_SHORT).show();
 
     switch (result){
         case("login_success"):
@@ -212,6 +252,11 @@ protected void onPostExecute(MyWrapper w){
         case("register_success"):
             //register successful
             i = new Intent(context,MainActivity.class);
+            // code to save gsmIMEI into sharedPreferences
+            SharedPreferences sharedPref = context.getSharedPreferences("MyPref",Context.MODE_PRIVATE);
+            SharedPreferences.Editor editorReg = sharedPref.edit();
+            editorReg.putString("usr_gsmIMEI",gsmIMEI);
+            editorReg.apply();
             context.startActivity(i);
             break;
         case("register_failed"):
@@ -251,22 +296,17 @@ protected void onPostExecute(MyWrapper w){
             break;
         case("user_found"):
             //UpdateUser failed
-            errorMsg="Password change successful, log in to the app with the new password";
+            errorMsg="Password Reset Mail sent to "+usrEmail+" . Check your inbox or spam folder";
+            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+            break;
+        case("not_found1"):
+            //UpdateUser failed
+            errorMsg="User Account Not Found.Contact Site Admin for further assistance";
             Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
             break;
     }
 
-//            //create the user session variables
-//            //SessionManagement session = new SessionManagement(context);
-//            //session.createLoginSession(email);
-//            //context.startActivity(new Intent("com.mwenda.trackit.home"));
 
-//            //start the main activity through intent
-////            Intent i = new Intent(context,MainActivity.class);
-////            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-////            context.startActivity(i);
-//            //context.startActivity(new Intent(".MainActivity"));
-//        }
     progressDialog.dismiss();
     }
 protected void onProgressUpdate(Void... values){

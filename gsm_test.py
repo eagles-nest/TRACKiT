@@ -17,6 +17,18 @@ def getlatlong():
 	data=contents.split(",")
 	return data[0],data[1]
 
+def getIMEI():
+	#initialize the AT
+	gsm.write("AT\r")
+	time.sleep(2)
+	reply=gsm.read(gsm.inWaiting())
+	time.sleep(2)
+	gsm.write("AT+CGSN\r")
+	time.sleep(2)
+	reply=gsm.read(gsm.inWaiting())
+	return reply
+
+
 def send_sms(text):
 	#initialize the AT
 	gsm.write("AT\r")
@@ -46,6 +58,11 @@ def send_sms(text):
 			reply=gsm.read(gsm.inWaiting())
 			print("the received content is ->")
 			print(reply)
+			#reply=+CMGR: "REC UNREAD","+489300222",,"07/02/18.00:05:10+32"
+			x=reply.split(,);
+			number=x[1];
+			print("the number is->")
+			print(number)
 			if "LOCATE" in reply:
 				#prepare to send latlong to sender
 				gsm.write("AT+CSMP=17,167,0,16\r")
@@ -76,6 +93,7 @@ def send_cords(lat,lon):
 	#ensure gsm already connected to network
 	lat=lat
 	lon=lon
+	gsmIMEI=getIMEI()
 	#gprs attach
 	gsm.write('AT+CGATT=1\r')
 	time.sleep(2)
@@ -102,7 +120,7 @@ def send_cords(lat,lon):
 	reply=gsm.read(gsm.inWaiting())
 	print(reply)
 	#set up the parameters
-	url="https://evansmwendaem.webhost000.com/latlong.php?lat="+lat+"&lon="+lon
+	url="https://2db65f43.ngrok.io/latlong.php?lat="+lat+"&lon="+lon+"&gsmIMEI="+gsmIMEI
 	print(url)
 	#set the URL
 	gsm.write('AT+HTTPPARA="URL",url\r')
