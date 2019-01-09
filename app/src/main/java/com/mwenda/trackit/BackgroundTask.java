@@ -1,9 +1,4 @@
 package com.mwenda.trackit;
-
-/**
-* Created by NDANU on 10/11/2018.
-*/
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -46,15 +41,16 @@ ProgressDialog progressDialog;
         String ownPhone = myWrappers[0].ownPhone;
         String gsmPhone = myWrappers[0].gsmPhone;
 
-        //the URLs    2db65f43.ngrok.io
-//        String login_url = "https://evansmwendaem.000webhostapp.com/login.php";
-//        String reg_url = "https://evansmwendaem.000webhostapp.com/register.php";
-//        String update_url = "https://evansmwendaem.000webhostapp.com/update.php";
+        //the URLs
+        String login_url =  "https://evansmwendaem.000webhostapp.com/login.php";
+        String reg_url =    "https://evansmwendaem.000webhostapp.com/register.php";
+        String update_url = "https://evansmwendaem.000webhostapp.com/update.php";
+        String reset_url  = "https://evansmwendaem.000webhostapp.com/reset.php";
         //ngrok urls
-        String login_url  = "http://2db65f43.ngrok.io/projects/trackit/login.php";
-        String reg_url    = "http://2db65f43.ngrok.io/projects/trackit/register.php";
-        String update_url = "http://2db65f43.ngrok.io/projects/trackit/update.php";
-        String reset_url  = "http://2db65f43.ngrok.io/projects/trackit/reset.php";
+//        String login_url  = "http://2db65f43.ngrok.io/projects/trackit/login.php";
+//        String reg_url    = "http://2db65f43.ngrok.io/projects/trackit/register.php";
+//        String update_url = "http://2db65f43.ngrok.io/projects/trackit/update.php";
+
 
         if (method.equals("register")) {
             try {
@@ -216,7 +212,7 @@ protected void onPostExecute(MyWrapper wrapper){
     String username=wrapper.username;
     String gsmIMEI=wrapper.gsmPhone;
     String usrEmail=wrapper.email;
-    //Toast.makeText(context,result, Toast.LENGTH_SHORT).show();
+   // Toast.makeText(context,result, Toast.LENGTH_SHORT).show();
 
     switch (result){
         case("login_success"):
@@ -234,76 +230,76 @@ protected void onPostExecute(MyWrapper wrapper){
             String errorMsg="Error, Incorrect username/password combination";
             Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
             break;
-        case("user_null"):
-            //login->user doesnt exist
-            errorMsg="Error, Incorrect username/password combination";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
-        case("user_many"):
-            //login->duplicate user accounts
-            errorMsg="An error occurred, please consult with the system administrator for further assistance";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
-        case("user_exists"):
-            //register->user already exists
-            errorMsg="Username or Email Address already exists,please select another one ";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
-        case("register_success"):
-            //register successful
-            i = new Intent(context,MainActivity.class);
-            // code to save gsmIMEI into sharedPreferences
-            SharedPreferences sharedPref = context.getSharedPreferences("MyPref",Context.MODE_PRIVATE);
-            SharedPreferences.Editor editorReg = sharedPref.edit();
-            editorReg.putString("usr_gsmIMEI",gsmIMEI);
-            editorReg.apply();
-            context.startActivity(i);
-            break;
-        case("register_failed"):
-            //register failed
-            errorMsg="An error occured during registration, please try again";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
-        case("no_usernaeme"):
-            //update->username not submitted
-            errorMsg="An error occured, please try again later";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
-        case("update_success"):
-            //UpdateUser successful
-            errorMsg="Account details have been successfully updated";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
-        case("update_failed"):
-            //UpdateUser failed
-            errorMsg="Error,Failed to update account details, please try again";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
-        case("not_found"):
-            //UpdateUser failed
-            errorMsg="Error, A user with such an Email Address does not exist in the system";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
-        case("change_failed"):
-            //UpdateUser failed
-            errorMsg="Error,Failed to update account passsword, please try again later";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
-        case("change_success"):
-            //UpdateUser failed
-            errorMsg="Password change successful, log in to the app with the new password";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
-        case("user_found"):
-            //UpdateUser failed
-            errorMsg="Password Reset Mail sent to "+usrEmail+" . Check your inbox or spam folder";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
-        case("not_found1"):
-            //UpdateUser failed
-            errorMsg="User Account Not Found.Contact Site Admin for further assistance";
-            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
-            break;
+//        case("user_null"):
+//            //login->user doesnt exist
+//            errorMsg="Error, Incorrect username/password combination";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
+//        case("user_many"):
+//            //login->duplicate user accounts
+//            errorMsg="An error occurred, please consult with the system administrator for further assistance";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
+//        case("user_exists"):
+//            //register->user already exists
+//            errorMsg="Username or Email Address already exists,please select another one ";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
+//        case("register_success"):
+//            //register successful
+//            i = new Intent(context,MainActivity.class);
+//            // code to save gsmIMEI into sharedPreferences
+//            SharedPreferences sharedPref = context.getSharedPreferences("MyPref",Context.MODE_PRIVATE);
+//            SharedPreferences.Editor editorReg = sharedPref.edit();
+//            editorReg.putString("usr_gsmIMEI",gsmIMEI);
+//            editorReg.apply();
+//            context.startActivity(i);
+//            break;
+//        case("register_failed"):
+//            //register failed
+//            errorMsg="An error occured during registration, please try again";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
+//        case("no_usernaeme"):
+//            //update->username not submitted
+//            errorMsg="An error occured, please try again later";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
+//        case("update_success"):
+//            //UpdateUser successful
+//            errorMsg="Account details have been successfully updated";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
+//        case("update_failed"):
+//            //UpdateUser failed
+//            errorMsg="Error,Failed to update account details, please try again";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
+//        case("not_found"):
+//            //UpdateUser failed
+//            errorMsg="Error, A user with such an Email Address does not exist in the system";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
+//        case("change_failed"):
+//            //UpdateUser failed
+//            errorMsg="Error,Failed to update account passsword, please try again later";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
+//        case("change_success"):
+//            //UpdateUser failed
+//            errorMsg="Password change successful, log in to the app with the new password";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
+//        case("user_found"):
+//            //UpdateUser failed
+//            errorMsg="Password Reset Mail sent to "+usrEmail+" . Check your inbox or spam folder";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
+//        case("not_found1"):
+//            //UpdateUser failed
+//            errorMsg="User Account Not Found.Contact Site Admin for further assistance";
+//            Toast.makeText(context,errorMsg, Toast.LENGTH_LONG).show();
+//            break;
     }
 
 

@@ -6,14 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -32,6 +28,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import android.support.v7.app.ActionBarDrawerToggle;
 
 public class Homepage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -49,8 +46,7 @@ public class Homepage extends AppCompatActivity
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        android.support.v7.app.ActionBarDrawerToggle toggle = new android.support.v7.app.ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -241,7 +237,7 @@ public class Homepage extends AppCompatActivity
                 super.onPostExecute(s);
                 //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
                 if(s==null){
-                    Toast.makeText(Homepage.this, "Y "ou have no history to display", Toast.LENGTH_LONG).show();
+                    Toast.makeText(Homepage.this, "You have no history to display", Toast.LENGTH_LONG).show();
                 }else{
                     //you have cordinates
                     try {

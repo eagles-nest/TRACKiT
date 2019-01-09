@@ -21,15 +21,13 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class MainActivity extends AppCompatActivity {
     private EditText user_email;
     private EditText user_password;
-    private Button button_login;
-    private TextView textLogin;
     private String TAG = getClass().getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //user variables
+        //email/username & password
         user_email = (EditText)findViewById(R.id.editUsername);
         user_password = (EditText)findViewById(R.id.editPassword);
     }

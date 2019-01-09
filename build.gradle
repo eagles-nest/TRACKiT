@@ -7,9 +7,10 @@ buildscript {
         maven{
             url 'https://maven.google.com/'
         }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath 'com.google.gms:google-services:4.0.1'
         // google-services plugin
         classpath 'com.google.android.gms:play-services-ads:11.2.0'
