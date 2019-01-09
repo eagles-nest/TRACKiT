@@ -33,7 +33,6 @@ public class Register extends AppCompatActivity {
         user_gsmPhone=(EditText)findViewById(R.id.editgsmPhone);
         user_password=(EditText)findViewById(R.id.editPassword);
         user_cpassword=(EditText)findViewById(R.id.editCPassword);
-        redirectLogin();
     }
     //register the user
     public void register(View view){
@@ -82,17 +81,8 @@ public class Register extends AppCompatActivity {
     }
 
     //redirects user to register screen
-    public void redirectLogin(){
-        user_register = (TextView)findViewById(R.id.textRegister);
-        user_register.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //register activity called by an intent
-                        Intent intent = new Intent(Register.this,MainActivity.class);
-                        startActivity(intent);
-                    }
-                }
-        );
+    public void redirectLogin(View view){
+        Intent intent = new Intent(Register.this,MainActivity.class);
+        startActivity(intent);
     }
 }

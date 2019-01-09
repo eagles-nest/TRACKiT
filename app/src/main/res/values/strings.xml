@@ -21,7 +21,7 @@
     <string name="history">History</string>
     <string name="my_account">My Account</string>
     <string name="logout">Logout</string>
-    <string name="instructions">Click on the top menu icon\n to access the main fuctionalities of the mobile application.\n\nLOCATE retrieves the last known location of the laptop according to our servers\n\nHISTORY shows locations graphically on the map frequented or last detected\n\nMy Account allows you to make changes to your account details \n\nABOUT tells you more about the app and how it works\n\nLOGOUT logs you out of the application</string>
+    <string name="instructions">Click on the top left menu icon\n to access the main fuctionalities of the mobile application.\n\nLOCATE retrieves the last known location of the laptop according to our servers\n\nHISTORY shows locations graphically on the map frequented or last detected\n\nMy Account allows you to make changes to your account details \n\nABOUT tells you more about the app and how it works\n\nLOGOUT logs you out of the application</string>
     <string name="about">About</string>
     <string name="update_details">UPDATE DETAILS</string>
     <string name="emailNew">Enter New Email Address</string>
