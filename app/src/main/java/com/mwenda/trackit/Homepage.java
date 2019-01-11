@@ -1,12 +1,15 @@
 package com.mwenda.trackit;
 
+import android.Manifest;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -30,10 +33,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import android.support.v7.app.ActionBarDrawerToggle;
 
+import com.google.android.gms.maps.GoogleMap;
+
 public class Homepage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private TextView txtUsername;
     public String userName,gsmIMEI;
+    private GoogleMap mMap;
     //SupportMapFragment sMapFragment;
 
     @Override
@@ -59,7 +65,7 @@ public class Homepage extends AppCompatActivity
         String username=sharedPreferences.getString("usr_username",null);
         gsmIMEI=sharedPreferences.getString("usr_gsmIMEI",null);
         userName=username;
-        Toast.makeText(this,gsmIMEI, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"gsmIMEI->"+gsmIMEI, Toast.LENGTH_SHORT).show();
 
         txtUsername=(TextView)findViewById(R.id.textViewWelcome);
         txtUsername.setText("Welcome "+username+",\n");
@@ -140,7 +146,11 @@ public class Homepage extends AppCompatActivity
     }
 
     private void getLocation(){
-        getJSON("https://2db65f43.ngrok.io/locate.php?limit=1&gsmIMEI="+gsmIMEI);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            //TODO:REQUEST FOR RUNTIME LOCATION PERMISSIONS FROM USER
+        }
+        getJSON("https://evansmwendaem.000webhostapp.com/locate.php?limit=1&gsmIMEI="+gsmIMEI);
     }
     private void getJSON(final String urlWebService){
         //urlWebService->url containing php script outputting the database data in json format
