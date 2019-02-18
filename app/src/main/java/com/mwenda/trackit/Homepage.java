@@ -8,15 +8,20 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +45,8 @@ public class Homepage extends AppCompatActivity
     private TextView txtUsername;
     public String userName,gsmIMEI;
     private GoogleMap mMap;
+    private static final int LOCATION_ACCESS_DENIED=1;//1 means no access
+    private boolean mPermissionDenied = false;
     //SupportMapFragment sMapFragment;
 
     @Override
@@ -59,18 +66,10 @@ public class Homepage extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setItemIconTintList(null);
         navigationView.setNavigationItemSelectedListener(this);
-        //get the value of the username
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("MyPref",MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        String username=sharedPreferences.getString("usr_username",null);
-        gsmIMEI=sharedPreferences.getString("usr_gsmIMEI",null);
-        userName=username;
-        Toast.makeText(this,"gsmIMEI->"+gsmIMEI, Toast.LENGTH_SHORT).show();
+
 
         txtUsername=(TextView)findViewById(R.id.textViewWelcome);
-        txtUsername.setText("Welcome "+username+",\n");
 
-//        sMapFragment.getMapAsync(this);
     }
 
     @Override
@@ -118,13 +117,6 @@ public class Homepage extends AppCompatActivity
         switch(id){
             case (R.id.nav_locate):
                 getLocation();
-//                if(!sMapFragment.isAdded()){
-//                    sFM.beginTransaction().add(R.id.map,sMapFragment).commit();
-//                }else{
-//                    sFM.beginTransaction().show(sMapFragment).commit();
-//                }
-
-                //locate();
                 break;
             case (R.id.nav_history):
                 history();
@@ -146,11 +138,58 @@ public class Homepage extends AppCompatActivity
     }
 
     private void getLocation(){
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        checkRuntimePerm();
+        //TODO:REQUEST FOR RUNTIME LOCATION PERMISSIONS FROM USER
+        //getJSON("https://evansmwendaem.000webhostapp.com/locate.php?limit=1&gsmIMEI="+gsmIMEI);
+    }
+    private void checkRuntimePerm(){
+        //check runtime permissions for location access
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            //TODO:REQUEST FOR RUNTIME LOCATION PERMISSIONS FROM USER
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_ACCESS_DENIED);
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                //Toast.makeText(this, "Please allow location access for the application to work", Toast.LENGTH_SHORT).show();
+            } else {
+                // No explanation needed; request the permission
+                //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                // LOCATION_PERMISSION_REQUEST_CODE);
+
+                // LOCATION_PERMISSION_REQUEST_CODE is an app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            // Permission has already been granted
+            Toast.makeText(this, "Permisssions granted", Toast.LENGTH_SHORT).show();
+            //getJSON("https://evansmwendaem.000webhostapp.com/locate.php?limit=1&gsmIMEI="+gsmIMEI);
         }
-        getJSON("https://evansmwendaem.000webhostapp.com/locate.php?limit=1&gsmIMEI="+gsmIMEI);
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        Log.i("requestCode:->",String.valueOf(requestCode));
+//        if (requestCode == LOCATION_ACCESS_DENIED) {
+//            Toast.makeText(this, "Please allow location access for the application to work", Toast.LENGTH_SHORT).show();
+//        }else if(requestCode != LOCATION_ACCESS_DENIED){
+//            Toast.makeText(this, "was that too much to ask?", Toast.LENGTH_SHORT).show();
+//        }
+        //Toast.makeText(this, "request code->"+String.valueOf(requestCode), Toast.LENGTH_SHORT).show();
+
+
+//        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
+//                Manifest.permission.ACCESS_FINE_LOCATION)) {
+//            // Enable the my location layer if the permission has been granted.
+//            enableMyLocation();
+//        } else {
+//            // Display the missing permission error dialog when the fragments resume.
+//            mPermissionDenied = true;
+//        }
     }
     private void getJSON(final String urlWebService){
         //urlWebService->url containing php script outputting the database data in json format
@@ -212,6 +251,7 @@ public class Homepage extends AppCompatActivity
         getJSON.execute();
     }
     private void showloc(String json) throws JSONException{
+        //checkRuntimePerm();
         //extract the lat,lon from json string
         JSONObject object = new JSONObject(json);
         JSONArray jArray = object.getJSONArray("result");
@@ -229,9 +269,11 @@ public class Homepage extends AppCompatActivity
         }
     }
 
+
+
     //history module
     private void history(){
-        getJSON1("https://2db65f43.ngrok.io/locate.php?limit=3");
+        getJSON1("https://evansmwendaem.000webhostapp.com/locate.php?limit=3");
     }
     private void getJSON1(final String urlWebService){
         //urlWebService->url containing php script outputting the database data in json format

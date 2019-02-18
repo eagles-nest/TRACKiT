@@ -5,7 +5,7 @@ buildscript {
 //        google() // Google's Maven repository
         jcenter()
         maven{
-            url 'https://maven.google.com/'
+            url 'https://maven.google.com'
         }
         google()
     }

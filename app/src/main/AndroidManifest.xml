@@ -23,17 +23,19 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
         <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".Register" />
         <activity
             android:name=".Homepage"
             android:label="@string/title_activity_homepage"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme" >
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
         <activity android:name=".ForgotPass" />
         <activity android:name=".Account" />
 
