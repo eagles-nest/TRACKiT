@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -40,12 +41,15 @@ import android.support.v7.app.ActionBarDrawerToggle;
 
 import com.google.android.gms.maps.GoogleMap;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
 public class Homepage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private TextView txtUsername;
     public String userName,gsmIMEI;
     private GoogleMap mMap;
     private static final int LOCATION_ACCESS_DENIED=1;//1 means no access
+    private static final int PERMISSION_REQUEST_CODE = 200;
     private boolean mPermissionDenied = false;
     //SupportMapFragment sMapFragment;
 
@@ -138,58 +142,63 @@ public class Homepage extends AppCompatActivity
     }
 
     private void getLocation(){
-        checkRuntimePerm();
-        //TODO:REQUEST FOR RUNTIME LOCATION PERMISSIONS FROM USER
-        //getJSON("https://evansmwendaem.000webhostapp.com/locate.php?limit=1&gsmIMEI="+gsmIMEI);
-    }
-    private void checkRuntimePerm(){
-        //check runtime permissions for location access
-        if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_ACCESS_DENIED);
+        if(checkPermission()){
+            //permission already granted
+            getJSON("https://evansmwendaem.000webhostapp.com/locate.php?limit=1&gsmIMEI="+718145956);
+        }else{
+            //permission not granted->request permission
+            requestPermission();
 
-            // Permission is not granted
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-                //Toast.makeText(this, "Please allow location access for the application to work", Toast.LENGTH_SHORT).show();
-            } else {
-                // No explanation needed; request the permission
-                //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                // LOCATION_PERMISSION_REQUEST_CODE);
-
-                // LOCATION_PERMISSION_REQUEST_CODE is an app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-        } else {
-            // Permission has already been granted
-            Toast.makeText(this, "Permisssions granted", Toast.LENGTH_SHORT).show();
-            //getJSON("https://evansmwendaem.000webhostapp.com/locate.php?limit=1&gsmIMEI="+gsmIMEI);
         }
     }
+
+    private boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(getApplicationContext(), ACCESS_FINE_LOCATION);
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+    }
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        Log.i("requestCode:->",String.valueOf(requestCode));
-//        if (requestCode == LOCATION_ACCESS_DENIED) {
-//            Toast.makeText(this, "Please allow location access for the application to work", Toast.LENGTH_SHORT).show();
-//        }else if(requestCode != LOCATION_ACCESS_DENIED){
-//            Toast.makeText(this, "was that too much to ask?", Toast.LENGTH_SHORT).show();
-//        }
-        //Toast.makeText(this, "request code->"+String.valueOf(requestCode), Toast.LENGTH_SHORT).show();
-
-
-//        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-//                Manifest.permission.ACCESS_FINE_LOCATION)) {
-//            // Enable the my location layer if the permission has been granted.
-//            enableMyLocation();
-//        } else {
-//            // Display the missing permission error dialog when the fragments resume.
-//            mPermissionDenied = true;
-//        }
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0) {
+                    boolean locationAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if (locationAccepted){
+                        //location granted
+                        //Snackbar.make(view, "Permission Granted, Now you can access location data and camera.", Snackbar.LENGTH_LONG).show();
+                        getJSON("https://evansmwendaem.000webhostapp.com/locate.php?limit=1&gsmIMEI="+gsmIMEI);
+                    }else {
+                        //permission denied
+                        //Snackbar.make(view, "Permission Denied, You cannot access location data and camera.", Snackbar.LENGTH_LONG).show();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
+                                showMessageOKCancel("You need to allow access to this permission for the app to work",
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                    requestPermissions(new String[]{ACCESS_FINE_LOCATION},
+                                                            PERMISSION_REQUEST_CODE);
+                                                }
+                                            }
+                                        });
+                                return;
+                            }
+                        }
+                    }
+                }
+                break;
+        }
+    }
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(Homepage.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
     }
     private void getJSON(final String urlWebService){
         //urlWebService->url containing php script outputting the database data in json format
