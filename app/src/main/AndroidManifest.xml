@@ -22,14 +22,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
-        <activity android:name=".Authentication.MainActivity">
-        </activity>
+        <activity android:name=".Authentication.MainActivity"></activity>
         <activity android:name=".Authentication.Register" />
         <activity
             android:name=".Homepage"
             android:label="@string/title_activity_homepage"
-            android:theme="@style/AppTheme"></activity>
-        <activity android:name=".ForgotPass" />
+            android:theme="@style/AppTheme" />
+        <activity android:name=".Authentication.ForgotPass" />
         <activity android:name=".Account" />
 
         <!--
@@ -60,6 +59,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Authentication.ResetPass"></activity>
     </application>
 
 </manifest>

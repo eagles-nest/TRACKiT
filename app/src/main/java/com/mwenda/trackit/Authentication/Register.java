@@ -118,21 +118,25 @@ public class Register extends AppCompatActivity {
                 URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                //Toast.makeText(Register.this, response, Toast.LENGTH_SHORT).show();
                 progressDialog.dismiss();
                 //Toast.makeText(Signupuser.this, response, Toast.LENGTH_LONG).show();
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     boolean status = jsonObject.optBoolean("success", false);
-                    JSONObject jsonObject1 = jsonObject.getJSONObject("message");
+                    //JSONObject jsonObject1 = jsonObject.getJSONObject("message");
+                    String reply=jsonObject.optString("message","");
                     if(status){
                         //(true)registration successful
-                        Toast.makeText(Register.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Register.this, reply, Toast.LENGTH_SHORT).show();
                         //clear all shared preferences in the device
                         SharedPreferences.Editor e=sp.edit();
                         e.clear();
                         e.apply();
                         Intent intent = new Intent(Register.this, MainActivity.class);
                         startActivity(intent);
+                    }else{
+                        Toast.makeText(Register.this,reply, Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     // JSON error
@@ -150,20 +154,9 @@ public class Register extends AppCompatActivity {
 
                     try {
                         JSONObject jsonObject = new JSONObject(errorString);
-                        JSONObject jsonObject1 = jsonObject.getJSONObject("message");
+
                         //get the error messages
-                        String emailErr=jsonObject1.optString("email","");
-                        String phoneErr=jsonObject1.optString("phone","");
-                        StringBuilder reply = new StringBuilder();
-
-
-                        String[] errors = {emailErr, phoneErr};
-                        for (int i = 0; i < errors.length; i++) {
-                            if (!errors[i].isEmpty()) {
-                                errors[i] = errors[i].replaceAll("[^\\w\\.\\@\\s]", "");
-                                reply.append(errors[i] + "\t");
-                            }
-                        }
+                        String reply=jsonObject.optString("message","");
                         Toast.makeText(Register.this,reply,Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         // JSON error
@@ -178,8 +171,8 @@ public class Register extends AppCompatActivity {
                 // Posting parameters to login url
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("email", email);
-                params.put("ownPhone", ownPhone);
-                params.put("gsmPhone", gsmPhone);
+                params.put("phoneNumber", ownPhone);
+                params.put("gsmNumber", gsmPhone);
                 params.put("password", password);
                 return params;
             }

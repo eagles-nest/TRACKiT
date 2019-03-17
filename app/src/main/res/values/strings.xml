@@ -29,4 +29,6 @@
     <string name="title_activity_locate">Map</string>
     <string name="title_activity_history">Map</string>
     <string name="chant">You lose it, we track it</string>
+    <string name="code">Reset Code</string>
+    <string name="submit">Submit</string>
 </resources>

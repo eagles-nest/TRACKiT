@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="500dp"
+    >
+
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="183dp"
+        app:srcCompat="@drawable/logo" />
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/wrapper_code"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        app:passwordToggleEnabled="true"
+        android:layout_below="@+id/imageView"
+        android:layout_marginRight="@dimen/activity_horizontal_margin">
+        <EditText
+            android:id="@+id/etcode"
+            android:layout_width="match_parent"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number"
+            android:hint="@string/code"
+            />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/btentercode"
+        android:layout_width="176dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/wrapper_code"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:textColor="#fff"
+        android:background="@drawable/btnshapes"
+        android:text="@string/submit" />
+
+
+</RelativeLayout>
