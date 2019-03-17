@@ -8,7 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusable="true" android:focusableInTouchMode="true"
-    tools:context="com.mwenda.trackit.Register">
+    tools:context="com.mwenda.trackit.Authentication.Register">
 
     <ImageView
         android:id="@+id/imageView"
@@ -48,23 +48,13 @@
         android:layout_marginEnd="20dp"
         android:hint="@string/gsmPhone"
         android:layout_below="@+id/editownPhone"/>
-    <EditText
-        android:id="@+id/editUsername"
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:hint="@string/username"
-        android:layout_below="@+id/editgsmPhone"/>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/password_text_input_layout"
         app:passwordToggleEnabled="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editUsername">
+        android:layout_below="@+id/editgsmPhone">
     <EditText
         android:id="@+id/editPassword"
         android:layout_marginTop="10dp"

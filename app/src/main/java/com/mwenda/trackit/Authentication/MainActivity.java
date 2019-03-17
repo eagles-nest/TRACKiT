@@ -1,18 +1,16 @@
-package com.mwenda.trackit;
+package com.mwenda.trackit.Authentication;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.NetworkResponse;
@@ -23,26 +21,32 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.mwenda.trackit.App.Constants;
+import com.mwenda.trackit.ForgotPass;
+import com.mwenda.trackit.Homepage;
+import com.mwenda.trackit.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Wrapper;
 import java.util.HashMap;
 import java.util.Map;
-
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class MainActivity extends AppCompatActivity {
     private EditText user_email;
     private EditText user_password;
     private ProgressDialog progressDialog;
     private String TAG = getClass().getSimpleName();
+    SharedPreferences sp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        sp=getSharedPreferences("login",MODE_PRIVATE);
+        //if previously logged in..dont ask for email/password
+        if(sp.contains("email")){
+            startActivity(new Intent(MainActivity.this,Homepage.class));
+            finish();   //finish current activity
+        }
         //email/username & password
         user_email = (EditText)findViewById(R.id.editUsername);
         user_password = (EditText)findViewById(R.id.editPassword);
@@ -59,14 +63,9 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
         }else{
             //proceed to authenticate user
-            String method="login";
-            boolean isConnected = checkInternet(this);
-            if(isConnected){
+            if(checkInternet(this)){
                 //device has internet
                 usrLogin(email,password);
-//                BackgroundTask backgroundTask = new BackgroundTask(MainActivity.this);
-//                MyWrapper myWrapper= new MyWrapper(method,email,email,password,"","","");
-//                backgroundTask.execute(myWrapper);
             }else{
                 //device has no internet connection
                 String errorMsg="Error, please check your internet connection and try again";
@@ -93,6 +92,10 @@ public class MainActivity extends AppCompatActivity {
 
                     if(status){
                         //(true)login successful
+                        //store details in SHARED PREFERENCES
+                        SharedPreferences.Editor e = sp.edit();
+                        e.putString("email",email);
+                        e.apply();
                         Intent intent = new Intent(MainActivity.this, Homepage.class);
                         startActivity(intent);
                     } else{

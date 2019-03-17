@@ -1,6 +1,5 @@
 package com.mwenda.trackit;
 
-import android.Manifest;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,9 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -19,10 +16,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,9 +32,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import android.support.v7.app.ActionBarDrawerToggle;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.mwenda.trackit.Authentication.MainActivity;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -52,6 +47,7 @@ public class Homepage extends AppCompatActivity
     private static final int PERMISSION_REQUEST_CODE = 200;
     private boolean mPermissionDenied = false;
     //SupportMapFragment sMapFragment;
+    SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +56,7 @@ public class Homepage extends AppCompatActivity
         setContentView(R.layout.activity_homepage);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        sp=getSharedPreferences("login",MODE_PRIVATE);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -127,9 +124,6 @@ public class Homepage extends AppCompatActivity
                 break;
             case (R.id.nav_account):
                 account(userName);
-                break;
-            case (R.id.nav_about):
-                about();
                 break;
             case (R.id.nav_logout):
                 logout();
@@ -376,11 +370,6 @@ public class Homepage extends AppCompatActivity
         //Toast.makeText(Homepage.this,"account function",Toast.LENGTH_LONG).show();
     }
 
-    private void about() {
-        //about the app
-        Toast.makeText(Homepage.this,"About function",Toast.LENGTH_LONG).show();
-    }
-
     private void logout(){
         //logs user out->destroy saved preferences
         final SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("MyPref",MODE_PRIVATE);
@@ -392,8 +381,9 @@ public class Homepage extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent= new Intent(Homepage.this,MainActivity.class);
-//                        editor.clear();
-//                        editor.commit();
+                        SharedPreferences.Editor e = sp.edit();
+                        e.clear();
+                        e.apply();
                         startActivity(intent);
                         finish();
                     }

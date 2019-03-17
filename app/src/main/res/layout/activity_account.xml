@@ -36,7 +36,7 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/password_text_input_layout"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         app:passwordToggleEnabled="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
         android:id="@+id/buttonRegister"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:text="@string/update_details"
