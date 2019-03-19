@@ -1,6 +1,7 @@
 package com.mwenda.trackit;
 
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,8 +33,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.GoogleMap;
+import com.mwenda.trackit.App.Constants;
 import com.mwenda.trackit.Authentication.MainActivity;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -42,12 +51,10 @@ public class Homepage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private TextView txtUsername;
     public String gsmIMEI;
-    private GoogleMap mMap;
-    private static final int LOCATION_ACCESS_DENIED=1;//1 means no access
     private static final int PERMISSION_REQUEST_CODE = 200;
-    private boolean mPermissionDenied = false;
-    //SupportMapFragment sMapFragment;
+    private static final int PERMISSION_REQUEST_CODE2 = 201;
     SharedPreferences sp;
+    boolean permEnabled=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +65,11 @@ public class Homepage extends AppCompatActivity
         setSupportActionBar(toolbar);
         sp=getSharedPreferences("login",MODE_PRIVATE);
 
-
+        if(checkPerm()){
+            permEnabled=true;
+        }else{
+            permEnabled=false;
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         android.support.v7.app.ActionBarDrawerToggle toggle = new android.support.v7.app.ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -70,6 +81,18 @@ public class Homepage extends AppCompatActivity
 
 
         txtUsername=(TextView)findViewById(R.id.textViewWelcome);
+
+    }
+
+    private boolean checkPerm() {
+        boolean permissionGranted = ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        if(permissionGranted){
+            //permission granted
+            return true;
+        }else{
+            //permission NOT granted
+            return false;
+        }
 
     }
 
@@ -136,23 +159,15 @@ public class Homepage extends AppCompatActivity
     }
 
     private void getLocation(){
-        if(checkPermission()){
-            //permission already granted
-            getJSON("https://evansmwendaem.000webhostapp.com/locate.php?limit=1&gsmIMEI="+718145956);
+        if(permEnabled){
+            //location permission on
+            getJSON("718145956");
         }else{
-            //permission not granted->request permission
-            requestPermission();
-
+            //request permission
+            ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
         }
     }
 
-    private boolean checkPermission() {
-        int result = ContextCompat.checkSelfPermission(getApplicationContext(), ACCESS_FINE_LOCATION);
-        return result == PackageManager.PERMISSION_GRANTED;
-    }
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
-    }
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -160,12 +175,36 @@ public class Homepage extends AppCompatActivity
                 if (grantResults.length > 0) {
                     boolean locationAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                     if (locationAccepted){
-                        //location granted
-                        //Snackbar.make(view, "Permission Granted, Now you can access location data and camera.", Snackbar.LENGTH_LONG).show();
-                        getJSON("https://evansmwendaem.000webhostapp.com/locate.php?limit=1&gsmIMEI="+gsmIMEI);
+                        permEnabled=true;
+                        getJSON("718145956");
                     }else {
                         //permission denied
-                        //Snackbar.make(view, "Permission Denied, You cannot access location data and camera.", Snackbar.LENGTH_LONG).show();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
+                                showMessageOKCancel("You need to allow access to this permission for the app to work",
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                    requestPermissions(new String[]{ACCESS_FINE_LOCATION},
+                                                            PERMISSION_REQUEST_CODE);
+                                                }
+                                            }
+                                        });
+                                return;
+                            }
+                        }
+                    }
+                }
+                break;
+            case PERMISSION_REQUEST_CODE2:
+                if (grantResults.length > 0) {
+                    boolean locationAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if (locationAccepted){
+                        permEnabled=true;
+                        getJSON1("718145956");
+                    }else {
+                        //permission denied
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
                                 showMessageOKCancel("You need to allow access to this permission for the app to work",
@@ -194,173 +233,121 @@ public class Homepage extends AppCompatActivity
                 .create()
                 .show();
     }
-    private void getJSON(final String urlWebService){
-        //urlWebService->url containing php script outputting the database data in json format
-        class GetJSON extends AsyncTask<Void, Void, String> {
-            @Override
-            protected void onPreExecute() {
-                //Called before execution..may set a progress bar
-                super.onPreExecute();
-            }
-            //display toast with json string
-            @Override
-            protected void onPostExecute(String s) {
-                super.onPostExecute(s);
+    private void getJSON(final String gsmIMEI){
+        String url = Constants.LOCATE_URL+gsmIMEI;//get latlon endpoint
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String lat="";
+                            String lon="";
+                            String timestamp="";
+                            JSONObject jsonObject = new JSONObject(String.valueOf(response));
+                            boolean status=jsonObject.optBoolean("success",false);
+                            if(status){
+                                //results found
+                                JSONObject jsonObject1 = jsonObject.getJSONObject("message");
+                                JSONArray jArray = jsonObject1.getJSONArray("result");
+                                for(int i=0;i<jArray.length();i++){
+                                    JSONObject jsonObject2 = jArray.getJSONObject(i);//latlong object
+                                    lat=jsonObject2.optString("latitude","");
+                                    lon=jsonObject2.optString("longitude","");
+                                    timestamp=jsonObject2.optString("timestamp","");
+                                    //send the data to the locate class to display marker on map
+                                    //on the provided latitude & longitude
+                                }
 
-                if(s==null){
-                    Toast.makeText(Homepage.this, "You have no co-ordinates to display", Toast.LENGTH_LONG).show();
-                }else{
-                    //you have cordinates
-                    try {
-                        showloc(s);
-                        //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                                Intent a = new Intent(Homepage.this,Locate.class);
+                                a.putExtra("lat",lat);
+                                a.putExtra("lon",lon);
+                                a.putExtra("time",timestamp);
+                                startActivity(a);
+                            }else{
+                                //no results found
+                                String reply=jsonObject.optString("message","Location data not found");
+                                Toast.makeText(Homepage.this, reply, Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            }
-            @Override
-            protected String doInBackground(Void... params) {
-                //creating a URL
-                try {
-                    URL url = new URL(urlWebService);
-                    //open the url
-                    HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-                    httpURLConnection.setDoOutput(true);
-                    //string builder object to read the data
-                    InputStream inputStream = httpURLConnection.getInputStream();
-                    //BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String json;
-                    while((json = bufferedReader.readLine()) != null){
-                        stringBuilder.append(json +"\n");
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //Toast.makeText(Spareparts.this, "error getting all car types "+error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Homepage.this, "Location data not found ", Toast.LENGTH_LONG).show();
                     }
-                    bufferedReader.close();
-                    inputStream.close();
-                    //return the read string
-                    String sb = stringBuilder.toString().trim();
-                    return sb;
-                }catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-
-            }
-        }
-        //creating asynctask object and executing it
-        GetJSON getJSON = new GetJSON();
-        getJSON.execute();
+                });
+        RequestQueue requestQueue = Volley.newRequestQueue(Homepage.this);
+        requestQueue.add(jsonObjectRequest);
     }
-    private void showloc(String json) throws JSONException{
-        //checkRuntimePerm();
-        //extract the lat,lon from json string
-        JSONObject object = new JSONObject(json);
-        JSONArray jArray = object.getJSONArray("result");
-        for(int i=0;i<jArray.length();i++){
-            JSONObject jasonobject = jArray.getJSONObject(i);
-            String lat = jasonobject.getString("latitude");
-            String lon = jasonobject.getString("longitude");
-            String timestamp=jasonobject.getString("timestamp");
-            //send these values to the locate function
-            Intent a = new Intent(Homepage.this,Locate.class);
-            a.putExtra("lat",lat);
-            a.putExtra("lon",lon);
-            a.putExtra("time",timestamp);
-            startActivity(a);
-        }
-    }
-
-
 
     //history module
     private void history(){
-        getJSON1("https://evansmwendaem.000webhostapp.com/locate.php?limit=3");
-    }
-    private void getJSON1(final String urlWebService){
-        //urlWebService->url containing php script outputting the database data in json format
-        class GetJSON extends AsyncTask<Void, Void, String> {
-            @Override
-            protected void onPreExecute() {
-                //Called before execution..may set a progress bar
-                super.onPreExecute();
-            }
-            //display toast with json string
-            @Override
-            protected void onPostExecute(String s) {
-                super.onPostExecute(s);
-                //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
-                if(s==null){
-                    Toast.makeText(Homepage.this, "You have no history to display", Toast.LENGTH_LONG).show();
-                }else{
-                    //you have cordinates
-                    try {
-                        showloc1(s);
-                        //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            @Override
-            protected String doInBackground(Void... params) {
-                //creating a URL
-                try {
-                    URL url = new URL(urlWebService);
-                    //open the url
-                    HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-                    httpURLConnection.setDoOutput(true);
-                    //string builder object to read the data
-                    InputStream inputStream = httpURLConnection.getInputStream();
-                    //BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"iso-8859-1"));
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String json;
-                    while((json = bufferedReader.readLine()) != null){
-                        stringBuilder.append(json +"\n");
-                    }
-                    bufferedReader.close();
-                    inputStream.close();
-                    //return the read string
-                    return stringBuilder.toString().trim();
-                }catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-
-            }
-        }
-        //creating asynctask object and executing it
-        GetJSON getJSON = new GetJSON();
-        getJSON.execute();
-    }
-    private void showloc1(String json) throws JSONException{
-        //extract the lat,lon from json string
-        JSONObject object = new JSONObject(json);
-        JSONArray jArray = object.getJSONArray("result");
-        //String [] location ={};
-        ArrayList<String> location = new ArrayList<String>();
-        ArrayList<String> location2 = new ArrayList<String>();
-        ArrayList<String> timers = new ArrayList<String>();
-        for(int i=0;i<jArray.length();i++){
-            JSONObject jasonobject = jArray.getJSONObject(i);
-            String lat  = jasonobject.getString("latitude");
-            String lon = jasonobject.getString("longitude");
-            String time  = jasonobject.getString("timestamp");
-            //String [] location =  {lat,lon};
-            //location[i] = lat,lon;//location[0]={1.24,3.45}
-            location.add(lat);//stores all the latitude values
-            location2.add(lon);//stores all the longitude values
-            timers.add(time);//stores all the longitude values
-            Intent a = new Intent(Homepage.this,History.class);
-            a.putExtra("latitude",location);
-            a.putExtra("longitude",location2);
-            a.putExtra("time",timers);
-            startActivity(a);
+        if(permEnabled){
+            //location permission on
+            getJSON1("718145956");
+        }else{
+            //request permission
+            ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE2);
         }
     }
+    private void getJSON1(final String gsmIMEI){
+        String url = Constants.HISTORY_URL+gsmIMEI;//get latlon endpoint
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String lat,lon,timestamp="";
+                            JSONObject jsonObject = new JSONObject(String.valueOf(response));
+                            boolean status=jsonObject.optBoolean("success",false);
+                            if(status){
+                                //results found->create array_lists to store data
+                                ArrayList<String> latitudes = new ArrayList<String>();
+                                ArrayList<String> longitudes = new ArrayList<String>();
+                                ArrayList<String> timestamps = new ArrayList<String>();
+
+
+                                JSONObject jsonObject1 = jsonObject.getJSONObject("message");
+                                JSONArray jArray = jsonObject1.getJSONArray("result");
+                                for(int i=0;i<jArray.length();i++){
+                                    JSONObject jsonObject2 = jArray.getJSONObject(i);//latlong object
+                                    lat=jsonObject2.optString("latitude","");
+                                    lon=jsonObject2.optString("longitude","");
+                                    timestamp=jsonObject2.optString("timestamp","");
+
+                                    //latitudes={-1.24,-1.2713,-1.2714}
+                                    latitudes.add(lat);//stores all the latitude values
+                                    longitudes.add(lon);//stores all the longitude values
+                                    timestamps.add(timestamp);//stores all the longitude values
+                                }
+                                Intent a = new Intent(Homepage.this,History.class);
+                                a.putExtra("latitudes",latitudes);
+                                a.putExtra("longitudes",longitudes);
+                                a.putExtra("timestamps",timestamps);
+                                startActivity(a);
+                            }else{
+                                //no results found
+                                String reply=jsonObject.optString("message","Location data not found");
+                                Toast.makeText(Homepage.this, reply, Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //Toast.makeText(Spareparts.this, "error getting all car types "+error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Homepage.this, "Location data not found ", Toast.LENGTH_LONG).show();
+                    }
+                });
+        RequestQueue requestQueue = Volley.newRequestQueue(Homepage.this);
+        requestQueue.add(jsonObjectRequest);
+    }
+
 
     private void account() {
         //load my account activity

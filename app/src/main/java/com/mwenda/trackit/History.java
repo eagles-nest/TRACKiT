@@ -30,18 +30,20 @@ public class History extends FragmentActivity implements OnMapReadyCallback {
         double [] lat={};
         double[] lon={};
         Bundle extras = getIntent().getExtras();
-        ArrayList<String> latitude = (ArrayList<String>)extras.getStringArrayList("latitude");
-        ArrayList<String> longitude = (ArrayList<String>)extras.getStringArrayList("longitude");
-        ArrayList<String> timers = (ArrayList<String>)extras.getStringArrayList("time");
-        //lat[0]=Double.parseDouble(latitude.get(0));
-        String e1 = latitude.get(0);String l1 = longitude.get(0);t1 = timers.get(0);
-        String e2 = latitude.get(1);String l2 = longitude.get(1);t2 = timers.get(1);
-        String e3 = latitude.get(2);String l3 = longitude.get(2);t3 = timers.get(2);
-        eo1=Double.parseDouble(e1);lo1=Double.parseDouble(l1);
-        eo2=Double.parseDouble(e2);lo2=Double.parseDouble(l2);
-        eo3=Double.parseDouble(e3);lo3=Double.parseDouble(l3);
+        ArrayList<String> latitudes = (ArrayList<String>)extras.getStringArrayList("latitudes");
+        ArrayList<String> longitudes = (ArrayList<String>)extras.getStringArrayList("longitudes");
+        ArrayList<String> timestamps = (ArrayList<String>)extras.getStringArrayList("timestamps");
+
+
+//        //lat[0]=Double.parseDouble(latitude.get(0));
+//        String e1 = latitude.get(0);String l1 = longitude.get(0);t1 = timers.get(0);
+//        String e2 = latitude.get(1);String l2 = longitude.get(1);t2 = timers.get(1);
+//        String e3 = latitude.get(2);String l3 = longitude.get(2);t3 = timers.get(2);
+//        eo1=Double.parseDouble(e1);lo1=Double.parseDouble(l1);
+//        eo2=Double.parseDouble(e2);lo2=Double.parseDouble(l2);
+//        eo3=Double.parseDouble(e3);lo3=Double.parseDouble(l3);
 //
-        Toast.makeText(this,String.valueOf(lo3),Toast.LENGTH_SHORT).show();//to confirm the cordinates reach the locate.java
+        Toast.makeText(this,String.valueOf(latitudes),Toast.LENGTH_SHORT).show();//to confirm the cordinates reach the locate.java
     }
 
 
