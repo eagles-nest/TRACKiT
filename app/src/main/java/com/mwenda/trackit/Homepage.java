@@ -41,7 +41,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 public class Homepage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private TextView txtUsername;
-    public String userName,gsmIMEI;
+    public String gsmIMEI;
     private GoogleMap mMap;
     private static final int LOCATION_ACCESS_DENIED=1;//1 means no access
     private static final int PERMISSION_REQUEST_CODE = 200;
@@ -123,7 +123,7 @@ public class Homepage extends AppCompatActivity
                 history();
                 break;
             case (R.id.nav_account):
-                account(userName);
+                account();
                 break;
             case (R.id.nav_logout):
                 logout();
@@ -362,12 +362,10 @@ public class Homepage extends AppCompatActivity
         }
     }
 
-    private void account(String username) {
+    private void account() {
         //load my account activity
         Intent intent = new Intent(Homepage.this,Account.class);
-        intent.putExtra("username",username);
         startActivity(intent);
-        //Toast.makeText(Homepage.this,"account function",Toast.LENGTH_LONG).show();
     }
 
     private void logout(){

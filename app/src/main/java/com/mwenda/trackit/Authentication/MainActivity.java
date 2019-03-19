@@ -90,13 +90,19 @@ public class MainActivity extends AppCompatActivity {
                     boolean status = jsonObject.optBoolean("success", false);
 
                     if(status){
+                        JSONObject jsonObject1 = jsonObject.getJSONObject("user_data");
+                        String phone = jsonObject1.optString("phone","");
+                        String gsm = jsonObject1.optString("gsm","");
                         //(true)login successful
                         //store details in SHARED PREFERENCES
                         SharedPreferences.Editor e = sp.edit();
                         e.putString("email",email);
+                        e.putString("phone",phone);
+                        e.putString("gsm",gsm);
                         e.apply();
                         Intent intent = new Intent(MainActivity.this, Homepage.class);
                         startActivity(intent);
+                        finish();
                     } else{
                         String reply = jsonObject.optString("message","");
                         Toast.makeText(MainActivity.this, reply, Toast.LENGTH_SHORT).show();
