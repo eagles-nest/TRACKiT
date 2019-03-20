@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -19,6 +20,7 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
     public String time;
     private double lat1,lon1;
     ProgressDialog progressDialog;
+    public SwipeRefreshLayout swipeLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +46,23 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
         StringBuilder sb = new StringBuilder();
         sb.append(lat+"\n"+lon);
         Toast.makeText(this,sb,Toast.LENGTH_SHORT).show();//to confirm the cordinates reach the locate.java
+        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Insert your code here
+                refreshActivity();
+            }
+        });
+    }
+
+    private void refreshActivity() {
+        final Intent intent = getIntent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        finish();
+        overridePendingTransition(0, 0);
+        startActivity(intent);
+        overridePendingTransition(0, 0);
     }
 
 
