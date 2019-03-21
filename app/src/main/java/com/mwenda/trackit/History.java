@@ -1,5 +1,6 @@
 package com.mwenda.trackit;
 
+import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -10,14 +11,26 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class History extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    ArrayList<String> latitudes;
+    ArrayList<String> longitudes;
+    ArrayList<String> timestamps;
     public String t1,t2,t3;
     public double eo1,eo2,eo3,lo1,lo2,lo3;
+    public double lat1,lon1;
+    String time;
+    LatLng loc13;
+    double[] latArray;
+    double[] lonArray;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,12 +40,16 @@ public class History extends FragmentActivity implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        double [] lat={};
-        double[] lon={};
+
         Bundle extras = getIntent().getExtras();
-        ArrayList<String> latitudes = (ArrayList<String>)extras.getStringArrayList("latitudes");
-        ArrayList<String> longitudes = (ArrayList<String>)extras.getStringArrayList("longitudes");
-        ArrayList<String> timestamps = (ArrayList<String>)extras.getStringArrayList("timestamps");
+        latitudes = (ArrayList<String>)extras.getStringArrayList("latitudes");
+        longitudes = (ArrayList<String>)extras.getStringArrayList("longitudes");
+        timestamps = (ArrayList<String>)extras.getStringArrayList("timestamps");
+
+        //lat&lon arrays
+        latArray = new double[latitudes.size()];
+        lonArray = new double[longitudes.size()];
+        //getAddrFrmLatlong(lat,lon)
 
 
 //        //lat[0]=Double.parseDouble(latitude.get(0));
@@ -60,17 +77,37 @@ public class History extends FragmentActivity implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng loc1 = new LatLng(eo1,lo1);
-        LatLng loc2 = new LatLng(eo2,lo2);
-        LatLng loc3 = new LatLng(eo3,lo3);
-        mMap.addMarker(new MarkerOptions().position(loc1).title(t1));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(loc1));
-        mMap.addMarker(new MarkerOptions().position(loc2).title(t2));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(loc2));
-        mMap.addMarker(new MarkerOptions().position(loc3).title(t3));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(loc3));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc3, 10.0f));
+        //Toast.makeText(this, "lat1->"+latitudes.get(0), Toast.LENGTH_SHORT).show();
+        for(int i=0;i<longitudes.size();i++){
+            //convert lat long to double
+            latArray[i]=Double.parseDouble(latitudes.get(i));//lat[0],lat[1],lat[2]
+            lonArray[i]=Double.parseDouble(longitudes.get(i));
+            loc13=new LatLng(latArray[i],lonArray[i]);
+            time=timestamps.get(i);
+
+            MarkerOptions options = new MarkerOptions()
+                    .title(time)
+                    .position(loc13)
+                    .snippet("address");
+            //setMarker(lat1,lon1,time);
+            mMap.addMarker(options);
+        }
+        for(int j=0;j<longitudes.size();j++){
+            int k=j+1;
+            if(k<longitudes.size()){
+                PolylineOptions line = new PolylineOptions()
+                        .add(new LatLng(latArray[j],lonArray[j]), new LatLng(latArray[k],lonArray[k]))
+                        .width(5)
+                        .color(Color.RED);
+                mMap.addPolyline(line);
+            }else{
+                //dont create polylineOptions
+            }
+
+        }
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(loc13));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc13, 10.0f));
     }
     //public void onBackPressed
     @Override

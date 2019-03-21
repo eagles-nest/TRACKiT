@@ -24,10 +24,6 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        progressDialog = new ProgressDialog(Locate.this);
-        progressDialog.setMessage("Locating ...");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
         setContentView(R.layout.activity_locate);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -78,17 +74,20 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if(progressDialog.isShowing()){
-            progressDialog.dismiss();
-        }
-
 
         // Add a marker in Sydney and move the camera
         LatLng laptop_location = new LatLng(lat1, lon1);
-        //LatLng laptop_location = new LatLng(lat1, lon1);
-        mMap.addMarker(new MarkerOptions().position(laptop_location).title(time));
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(laptop_location));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(laptop_location, 15.0f));
+        MarkerOptions options = new MarkerOptions()
+                .title(time)
+                .position(laptop_location);
+        mMap.addMarker(options);
+
+//        mMap.addMarker(new MarkerOptions().position(laptop_location).title(time));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(laptop_location));
+//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(laptop_location, 15.0f));
 
     }
 }
