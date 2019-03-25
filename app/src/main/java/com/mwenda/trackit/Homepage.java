@@ -93,7 +93,6 @@ public class Homepage extends AppCompatActivity
             //permission NOT granted
             return false;
         }
-
     }
 
     @Override
@@ -140,7 +139,9 @@ public class Homepage extends AppCompatActivity
 //        }
         switch(id){
             case (R.id.nav_locate):
-                getLocation();
+                //getLocation();
+                Intent intent = new Intent(this,Locate.class);
+                startActivity(intent);
                 break;
             case (R.id.nav_history):
                 history();
