@@ -38,44 +38,36 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 public class Locate extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    public String time;
-    private double lat1,lon1;
     String lat="";
     String lon="";
     String timestamp="";
-    ProgressDialog progressDialog;
     public SwipeRefreshLayout swipeLayout;
     boolean permEnabled=false;
     private static final int PERMISSION_REQUEST_CODE = 200;
     SupportMapFragment mapFragment;
+    String gsmIMEI;
+    ProgressDialog pDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_locate);
 
         if(checkPerm()){
             permEnabled=true;
         }else{
             permEnabled=false;
         }
-        getLocation();
-        setContentView(R.layout.activity_locate);
+        /**
+         * TODO get gsmIMEI from shared preferences upon login
+         */
+        gsmIMEI="718145956";
+        getLocation(gsmIMEI);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-//        Intent i = getIntent();
-//        String lat =  i.getStringExtra("lat");
-//        String lon = i.getStringExtra("lon");
-//        time = i.getStringExtra("time");
-//
-//        //convert the string types to double for latlong
-//        lat1=Double.parseDouble(lat);
-//        lon1=Double.parseDouble(lon);
-//
-//        StringBuilder sb = new StringBuilder();
-        //sb.append(lat+"\n"+lon);
-       // Toast.makeText(this,sb,Toast.LENGTH_SHORT).show();//to confirm the cordinates reach the locate.java
+
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -95,10 +87,10 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
             return false;
         }
     }
-    private void getLocation(){
+    private void getLocation(String gsmIMEI){
         if(permEnabled){
             //location permission on
-            getJSON("718145956");
+            getJSON(gsmIMEI);
         }else{
             //request permission
             ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
@@ -112,7 +104,7 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
                     boolean locationAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                     if (locationAccepted){
                         permEnabled=true;
-                        getJSON("718145956");
+                        getJSON(gsmIMEI);
                     }else {
                         //permission denied
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -144,6 +136,11 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
                 .show();
     }
     private void getJSON(final String gsmIMEI){
+        lat="";lon="";
+        pDialog = new ProgressDialog(Locate.this);
+        pDialog.setMessage("Retrieving location data...");
+        pDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        pDialog.show();
         String url = Constants.LOCATE_URL+gsmIMEI;//get latlon endpoint
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -162,17 +159,11 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
                                     lat=jsonObject2.optString("latitude","");
                                     lon=jsonObject2.optString("longitude","");
                                     timestamp=jsonObject2.optString("timestamp","");
-                                    //send the data to the locate class to display marker on map
-                                    //on the provided latitude & longitude
-                                }
 
-//                                Intent a = new Intent(Locate.this,Locate.class);
-//                                a.putExtra("lat",lat);
-//                                a.putExtra("lon",lon);
-//                                a.putExtra("time",timestamp);
-//                                startActivity(a);
+                                }
                             }else{
                                 //no results found
+                                pDialog.dismiss();
                                 String reply=jsonObject.optString("message","Location data not found");
                                 Toast.makeText(Locate.this, reply, Toast.LENGTH_SHORT).show();
                             }
@@ -183,6 +174,7 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        pDialog.dismiss();
                         //Toast.makeText(Spareparts.this, "error getting all car types "+error, Toast.LENGTH_SHORT).show();
                         Toast.makeText(Locate.this, "Location data not found ", Toast.LENGTH_LONG).show();
                     }
@@ -227,45 +219,37 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
                         if(!lat.isEmpty()){
                             double lat2=Double.parseDouble(lat);
                             double lon2=Double.parseDouble(lon);
+                            pDialog.dismiss();
                             LatLng laptop_location = new LatLng(lat2, lon2);
                             Toast.makeText(Locate.this,"lat->"+lat+"\nlon->"+lon,Toast.LENGTH_SHORT).show();
                             MarkerOptions options = new MarkerOptions()
-                                    .title(time)
+                                    .title(timestamp)
                                     .position(laptop_location);
                             //setMarker(lat1,lon1,time);
                             mMap.addMarker(options);
 
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(laptop_location));
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(laptop_location, 12.0f));
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(laptop_location, 15.0f));
 
                             mapFragment.onResume();
                         }else{
-                            //Toast.makeText(Mechanics.this, "Latitudes empty", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Locate.this, "Co-ordinates not found", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
                 timer2.cancel(); //this will cancel the timer of the system
             }
         }, 4000);
+    }
+    //public void onBackPressed
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+    }
 
-
-
-        Toast.makeText(this,"lat->"+lat+"\nlon->"+lon,Toast.LENGTH_SHORT).show();
-
-        // Add a marker in Sydney and move the camera
-        //LatLng laptop_location = new LatLng(lat1, lon1);
-
-
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(laptop_location));
-//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(laptop_location, 15.0f));
-//        MarkerOptions options = new MarkerOptions()
-//                .title(time)
-//                .position(laptop_location);
-//        mMap.addMarker(options);
-
-//        mMap.addMarker(new MarkerOptions().position(laptop_location).title(time));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(laptop_location));
-//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(laptop_location, 15.0f));
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mapFragment.onResume();
     }
 }

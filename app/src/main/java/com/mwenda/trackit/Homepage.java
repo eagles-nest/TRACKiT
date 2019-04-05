@@ -81,7 +81,6 @@ public class Homepage extends AppCompatActivity
 
 
         txtUsername=(TextView)findViewById(R.id.textViewWelcome);
-
     }
 
     private boolean checkPerm() {
@@ -134,17 +133,28 @@ public class Homepage extends AppCompatActivity
         FragmentManager fM = getFragmentManager();
         android.support.v4.app.FragmentManager sFM = getSupportFragmentManager();
         int id = item.getItemId();
-//        if(sMapFragment.isAdded()){
-//            sFM.beginTransaction().hide(sMapFragment).commit();
-//        }
         switch(id){
             case (R.id.nav_locate):
-                //getLocation();
-                Intent intent = new Intent(this,Locate.class);
-                startActivity(intent);
+                //redirect to the location class;
+                if(checkPerm()){
+                    permEnabled=true;
+                    Intent intent = new Intent(this,Locate.class);
+                    startActivity(intent);
+                }else{
+                    permEnabled=false;
+                    ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+                }
                 break;
             case (R.id.nav_history):
-                history();
+                //redirect to the history class
+                if(checkPerm()){
+                    permEnabled=true;
+                    Intent intent = new Intent(this,History.class);
+                    startActivity(intent);
+                }else{
+                    permEnabled=false;
+                    ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE2);
+                }
                 break;
             case (R.id.nav_account):
                 account();
@@ -159,16 +169,6 @@ public class Homepage extends AppCompatActivity
         return true;
     }
 
-    private void getLocation(){
-        if(permEnabled){
-            //location permission on
-            getJSON("718145956");
-        }else{
-            //request permission
-            ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -177,7 +177,8 @@ public class Homepage extends AppCompatActivity
                     boolean locationAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                     if (locationAccepted){
                         permEnabled=true;
-                        getJSON("718145956");
+                        Intent intent = new Intent(this,Locate.class);
+                        startActivity(intent);
                     }else {
                         //permission denied
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -203,7 +204,8 @@ public class Homepage extends AppCompatActivity
                     boolean locationAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                     if (locationAccepted){
                         permEnabled=true;
-                        getJSON1("718145956");
+                        Intent intent = new Intent(this,History.class);
+                        startActivity(intent);
                     }else {
                         //permission denied
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -214,7 +216,7 @@ public class Homepage extends AppCompatActivity
                                             public void onClick(DialogInterface dialog, int which) {
                                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                                     requestPermissions(new String[]{ACCESS_FINE_LOCATION},
-                                                            PERMISSION_REQUEST_CODE);
+                                                            PERMISSION_REQUEST_CODE2);
                                                 }
                                             }
                                         });
@@ -234,121 +236,6 @@ public class Homepage extends AppCompatActivity
                 .create()
                 .show();
     }
-    private void getJSON(final String gsmIMEI){
-        String url = Constants.LOCATE_URL+gsmIMEI;//get latlon endpoint
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String lat="";
-                            String lon="";
-                            String timestamp="";
-                            JSONObject jsonObject = new JSONObject(String.valueOf(response));
-                            boolean status=jsonObject.optBoolean("success",false);
-                            if(status){
-                                //results found
-                                JSONObject jsonObject1 = jsonObject.getJSONObject("message");
-                                JSONArray jArray = jsonObject1.getJSONArray("result");
-                                for(int i=0;i<jArray.length();i++){
-                                    JSONObject jsonObject2 = jArray.getJSONObject(i);//latlong object
-                                    lat=jsonObject2.optString("latitude","");
-                                    lon=jsonObject2.optString("longitude","");
-                                    timestamp=jsonObject2.optString("timestamp","");
-                                    //send the data to the locate class to display marker on map
-                                    //on the provided latitude & longitude
-                                }
-
-                                Intent a = new Intent(Homepage.this,Locate.class);
-                                a.putExtra("lat",lat);
-                                a.putExtra("lon",lon);
-                                a.putExtra("time",timestamp);
-                                startActivity(a);
-                            }else{
-                                //no results found
-                                String reply=jsonObject.optString("message","Location data not found");
-                                Toast.makeText(Homepage.this, reply, Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //Toast.makeText(Spareparts.this, "error getting all car types "+error, Toast.LENGTH_SHORT).show();
-                        Toast.makeText(Homepage.this, "Location data not found ", Toast.LENGTH_LONG).show();
-                    }
-                });
-        RequestQueue requestQueue = Volley.newRequestQueue(Homepage.this);
-        requestQueue.add(jsonObjectRequest);
-    }
-
-    //history module
-    private void history(){
-        if(permEnabled){
-            //location permission on
-            getJSON1("718145956");
-        }else{
-            //request permission
-            ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE2);
-        }
-    }
-    private void getJSON1(final String gsmIMEI){
-        String url = Constants.HISTORY_URL+gsmIMEI;//get latlon endpoint
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String lat,lon,timestamp="";
-                            JSONObject jsonObject = new JSONObject(String.valueOf(response));
-                            boolean status=jsonObject.optBoolean("success",false);
-                            if(status){
-                                //results found->create array_lists to store data
-                                ArrayList<String> latitudes = new ArrayList<String>();
-                                ArrayList<String> longitudes = new ArrayList<String>();
-                                ArrayList<String> timestamps = new ArrayList<String>();
-
-
-                                JSONObject jsonObject1 = jsonObject.getJSONObject("message");
-                                JSONArray jArray = jsonObject1.getJSONArray("result");
-                                for(int i=0;i<jArray.length();i++){
-                                    JSONObject jsonObject2 = jArray.getJSONObject(i);//latlong object
-                                    lat=jsonObject2.optString("latitude","");
-                                    lon=jsonObject2.optString("longitude","");
-                                    timestamp=jsonObject2.optString("timestamp","");
-
-                                    //latitudes={-1.24,-1.2713,-1.2714}
-                                    latitudes.add(lat);//stores all the latitude values
-                                    longitudes.add(lon);//stores all the longitude values
-                                    timestamps.add(timestamp);//stores all the longitude values
-                                }
-                                Intent a = new Intent(Homepage.this,History.class);
-                                a.putExtra("latitudes",latitudes);
-                                a.putExtra("longitudes",longitudes);
-                                a.putExtra("timestamps",timestamps);
-                                startActivity(a);
-                            }else{
-                                //no results found
-                                String reply=jsonObject.optString("message","Location data not found");
-                                Toast.makeText(Homepage.this, reply, Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //Toast.makeText(Spareparts.this, "error getting all car types "+error, Toast.LENGTH_SHORT).show();
-                        Toast.makeText(Homepage.this, "Location data not found ", Toast.LENGTH_LONG).show();
-                    }
-                });
-        RequestQueue requestQueue = Volley.newRequestQueue(Homepage.this);
-        requestQueue.add(jsonObjectRequest);
-    }
-
 
     private void account() {
         //load my account activity
@@ -358,8 +245,6 @@ public class Homepage extends AppCompatActivity
 
     private void logout(){
         //logs user out->destroy saved preferences
-        final SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("MyPref",MODE_PRIVATE);
-        final SharedPreferences.Editor editor=sharedPreferences.edit();
         new AlertDialog.Builder(Homepage.this)
                 .setMessage("Logout of TrackIt?")
                 .setIcon(R.drawable.account)

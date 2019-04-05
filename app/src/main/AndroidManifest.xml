@@ -40,9 +40,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".Locate1"
-            android:label="@string/title_activity_locate1"></activity>
         <activity android:name=".Authentication.MainActivity" />
         <activity android:name=".Authentication.Register" />
         <activity
