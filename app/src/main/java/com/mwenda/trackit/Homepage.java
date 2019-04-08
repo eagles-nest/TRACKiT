@@ -2,10 +2,13 @@ package com.mwenda.trackit;
 
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -138,8 +141,14 @@ public class Homepage extends AppCompatActivity
                 //redirect to the location class;
                 if(checkPerm()){
                     permEnabled=true;
-                    Intent intent = new Intent(this,Locate.class);
-                    startActivity(intent);
+                    if(checkInternet(Homepage.this)){
+                        //has internet
+                        Intent intent = new Intent(this,Locate.class);
+                        startActivity(intent);
+                    }else{
+                        //no internet
+                        Toast.makeText(this, "Error, Please check your internet connection and try again", Toast.LENGTH_SHORT).show();
+                    }
                 }else{
                     permEnabled=false;
                     ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
@@ -149,8 +158,14 @@ public class Homepage extends AppCompatActivity
                 //redirect to the history class
                 if(checkPerm()){
                     permEnabled=true;
-                    Intent intent = new Intent(this,History.class);
-                    startActivity(intent);
+                    if(checkInternet(Homepage.this)){
+                        //has internet
+                        Intent intent = new Intent(this,History.class);
+                        startActivity(intent);
+                    }else{
+                        //no internet
+                        Toast.makeText(this, "Error, Please check your internet connection and try again", Toast.LENGTH_SHORT).show();
+                    }
                 }else{
                     permEnabled=false;
                     ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE2);
@@ -260,6 +275,13 @@ public class Homepage extends AppCompatActivity
                     }
                 })
                 .setNegativeButton("NO",null).show();
+    }
+    public boolean checkInternet(Context context){
+        ConnectivityManager cm =(ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
     }
 
 }
