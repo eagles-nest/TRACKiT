@@ -70,6 +70,7 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
 
 
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeLayout.setDistanceToTriggerSync(200);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
