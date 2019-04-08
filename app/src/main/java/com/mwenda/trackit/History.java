@@ -20,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -80,6 +81,7 @@ public class History extends FragmentActivity implements OnMapReadyCallback {
                 refreshActivity();
             }
         });
+
 
         latitudes=new ArrayList<>();
         longitudes=new ArrayList<>();
@@ -182,6 +184,10 @@ public class History extends FragmentActivity implements OnMapReadyCallback {
          * by then it will have fetched data to avoid null pointer exception
          */
         mMap = googleMap;
+        //get the ui settings of the google maps object
+        UiSettings uiSettings = mMap.getUiSettings();
+        uiSettings.setZoomControlsEnabled(true);//indicate zoom in / zoom out
+        uiSettings.setZoomGesturesEnabled(false);//disable zoom gestures to allow swipe to refresh layout to work well
         final Timer timer2 = new Timer();
         timer2.schedule(new TimerTask() {
             public void run() {
