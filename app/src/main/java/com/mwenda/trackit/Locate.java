@@ -143,6 +143,7 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
         pDialog = new ProgressDialog(Locate.this);
         pDialog.setMessage("Retrieving location data...");
         pDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        pDialog.setCanceledOnTouchOutside(false);
         pDialog.show();
         String url = Constants.LOCATE_URL+gsmIMEI;//get latlon endpoint
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest

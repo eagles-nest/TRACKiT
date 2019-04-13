@@ -115,6 +115,7 @@ public class History extends FragmentActivity implements OnMapReadyCallback {
         pDialog = new ProgressDialog(History.this);
         pDialog.setMessage("Retrieving location data...");
         pDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        pDialog.setCanceledOnTouchOutside(false);
         pDialog.show();
         String url = Constants.HISTORY_URL+gsmIMEI;//get latlon endpoint
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest

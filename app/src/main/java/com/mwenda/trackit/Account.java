@@ -99,6 +99,7 @@ public class Account extends AppCompatActivity {
         progressDialog = new ProgressDialog(Account.this);
         progressDialog.setMessage("Updating Account details ...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
         String URL = Constants.UPDATEACCOUNT_URL;
 

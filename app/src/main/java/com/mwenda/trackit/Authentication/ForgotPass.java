@@ -144,6 +144,7 @@ public class ForgotPass extends AppCompatActivity {
         progressDialog = new ProgressDialog(ForgotPass.this);
         progressDialog.setMessage("Sending code...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
         String URL = Constants.SENDRESETCODE_URL;
 

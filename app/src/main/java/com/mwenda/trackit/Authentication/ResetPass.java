@@ -71,6 +71,7 @@ public class ResetPass extends AppCompatActivity {
         progressDialog = new ProgressDialog(ResetPass.this);
         progressDialog.setMessage("Updating password...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
         String URL = Constants.UPDATEPASS_URL;
 

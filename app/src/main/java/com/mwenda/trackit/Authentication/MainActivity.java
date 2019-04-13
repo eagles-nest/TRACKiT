@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setMessage("Signing in...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
         String URL = Constants.LOGIN_URL;
 

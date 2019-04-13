@@ -111,6 +111,7 @@ public class Register extends AppCompatActivity {
         progressDialog = new ProgressDialog(Register.this);
         progressDialog.setMessage("Registering ...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
         String URL = Constants.REGISTER_URL;
 
