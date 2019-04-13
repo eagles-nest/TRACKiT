@@ -3,6 +3,7 @@ package com.mwenda.trackit;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
@@ -48,20 +49,20 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
     SupportMapFragment mapFragment;
     String gsmIMEI;
     ProgressDialog pDialog;
+    SharedPreferences sp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locate);
+        sp=getSharedPreferences("login",MODE_PRIVATE);
+        gsmIMEI=sp.getString("imei","");//865674036511646
 
         if(checkPerm()){
             permEnabled=true;
         }else{
             permEnabled=false;
         }
-        /**
-         * TODO get gsmIMEI from shared preferences upon login
-         */
-        gsmIMEI="718145956";
+
         getLocation(gsmIMEI);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()

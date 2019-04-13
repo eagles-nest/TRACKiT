@@ -2,6 +2,7 @@ package com.mwenda.trackit;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.support.v4.app.ActivityCompat;
@@ -54,11 +55,14 @@ public class History extends FragmentActivity implements OnMapReadyCallback {
     SwipeRefreshLayout swipeLayout;
     String gsmIMEI;
     ProgressDialog pDialog;
+    SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+        sp=getSharedPreferences("login",MODE_PRIVATE);
+        gsmIMEI=sp.getString("imei","");//865674036511646
 
 
         if(checkPerm()){
@@ -66,7 +70,6 @@ public class History extends FragmentActivity implements OnMapReadyCallback {
         }else{
             permEnabled=false;
         }
-        gsmIMEI="718145956";
         getHistory(gsmIMEI);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
