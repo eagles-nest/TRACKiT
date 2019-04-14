@@ -1,20 +1,25 @@
 package com.mwenda.trackit.Authentication;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -23,6 +28,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.mwenda.trackit.App.Constants;
@@ -30,6 +36,7 @@ import com.mwenda.trackit.Homepage;
 import com.mwenda.trackit.Locate;
 import com.mwenda.trackit.R;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private static final int PERMISSION_REQUEST_CODE = 200;
     SharedPreferences sp;
+    Dialog myDialog;
+    EditText etimei;
+    Button btnenter;
+    String imei,user_id,phone,gsm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         //email/username & password
         user_email = (EditText)findViewById(R.id.editUsername);
         user_password = (EditText)findViewById(R.id.editPassword);
+        myDialog = new Dialog(this);
+
     }
     //log the userin
     public void login(View view){
@@ -100,23 +113,36 @@ public class MainActivity extends AppCompatActivity {
 
                     if(status){
                         JSONObject jsonObject1 = jsonObject.getJSONObject("user_data");
-                        String phone = jsonObject1.optString("phone","");
-                        String gsm = jsonObject1.optString("gsm","");
-                        String imei = jsonObject1.optString("imei","");
+                        phone = jsonObject1.optString("phone","");
+                        gsm = jsonObject1.optString("gsm","");
+                        imei = jsonObject1.optString("imei","");
+                        user_id = jsonObject1.optString("user_id","");
+                        Toast.makeText(MainActivity.this, ""+imei, Toast.LENGTH_SHORT).show();
                         //(true)login successful
                         //store details in SHARED PREFERENCES
-                        SharedPreferences.Editor e = sp.edit();
-                        e.putString("email",email);
-                        e.putString("phone",phone);
-                        e.putString("gsm",gsm);
-                        e.putString("imei",imei);
-                        e.apply();
+
                         /**DEMAND  location permissions**/
                         if(checkPerm()){
-                           //good to go
-                            Intent intent = new Intent(MainActivity.this, Homepage.class);
-                            startActivity(intent);
-                            finish();
+                           //good to go->check IMEI
+                            switch (imei){
+                                case("0"):
+                                    Toast.makeText(MainActivity.this,"Update your gsm IMEI", Toast.LENGTH_LONG).show();
+                                    //TODO lat long is empty->ask user to enter location physically
+                                    updateIMEI(user_id,email);
+                                    break;
+                                default:
+                                    SharedPreferences.Editor e = sp.edit();
+                                    e.putString("email",email);
+                                    e.putString("phone",phone);
+                                    e.putString("gsm",gsm);
+                                    e.putString("imei",imei);
+                                    e.apply();
+                                    Intent intent = new Intent(MainActivity.this, Homepage.class);
+                                    startActivity(intent);
+                                    finish();
+                                    break;
+
+                            }
                         }else{
                             //request permissions
                             ActivityCompat.requestPermissions(MainActivity.this, new String[]{ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
@@ -164,6 +190,111 @@ public class MainActivity extends AppCompatActivity {
         };
         RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
         requestQueue.add(strReq);
+    }
+
+    private void updateIMEI(final String user_id1, final String user_email) {
+        myDialog.setContentView(R.layout.custompopup3);
+        myDialog.setCanceledOnTouchOutside(false);
+        etimei = (EditText) myDialog.findViewById(R.id.etimei);
+
+        btnenter =(Button) myDialog.findViewById(R.id.btentercode);
+        btnenter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //run function to submit imei to db
+                imei=etimei.getText().toString().trim();
+                Toast.makeText(MainActivity.this,imei+ "\t"+user_id, Toast.LENGTH_SHORT).show();
+                if(!imei.isEmpty()){
+                    if(checkInternet(MainActivity.this)){
+                        //has internet
+                        //submitLoc(location,id);
+                        progressDialog = new ProgressDialog(MainActivity.this);
+                        progressDialog.setMessage("Saving IMEI...");
+                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        progressDialog.setCanceledOnTouchOutside(false);
+                        progressDialog.show();
+                        //todo add code to make api request to update user account with imei
+                        //todo also save shared preferences data to sp
+
+                        String URL = Constants.UPDATEIMEI_URL;//update  gsm IMEI
+                        StringRequest strReq = new StringRequest(Request.Method.POST,
+                                URL, new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                progressDialog.dismiss();
+                                try {
+                                    JSONObject jsonObject = new JSONObject(response);
+                                    boolean status = jsonObject.optBoolean("success", false);
+                                    Log.d("evanso", "onResponse: "+jsonObject.toString());
+
+                                    if(status){
+                                        //update successful
+                                        String reply=jsonObject.optString("message");
+                                        Toast.makeText(MainActivity.this, reply, Toast.LENGTH_SHORT).show();
+                                        SharedPreferences.Editor e = sp.edit();
+                                        e.putString("email",user_email);
+                                        e.putString("phone",phone);
+                                        e.putString("gsm",gsm);
+                                        e.putString("imei",imei);
+                                        e.apply();
+                                        Intent intent = new Intent(MainActivity.this, Homepage.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else{
+                                    //no results found
+                                    String reply=jsonObject.optString("message");
+                                    Toast.makeText(MainActivity.this, reply, Toast.LENGTH_SHORT).show();
+                                    }
+                                } catch (JSONException e) {
+                                    // JSON error
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                progressDialog.dismiss();
+                                //String errorM = jsonObject
+                                NetworkResponse response1 = error.networkResponse;
+                                if(response1 != null && response1.data != null){
+                                    String errorString = new String(response1.data);
+                                    try {
+                                        JSONObject jsonObject = new JSONObject(errorString);
+                                        Log.d("evanso", "onErrorResponse: "+errorString);;
+                                        String reply = jsonObject.optString("message","");
+                                        //reply = reply.replaceAll("[^\\w\\.\\@\\s]", "");
+
+                                        Toast.makeText(MainActivity.this,reply,Toast.LENGTH_LONG).show();
+                                    } catch (JSONException e) {
+                                        // JSON error
+                                        e.printStackTrace();
+                                        Log.e("login : ", e.toString());
+                                    }
+                                }
+                            }
+                        }) {
+                            @Override
+                            protected Map<String, String> getParams() {
+                                // Posting parameters to login url
+                                Map<String, String> params = new HashMap<>();
+                                params.put("user_id", user_id1);
+                                params.put("gsmIMEI", imei);
+                                return params;
+                            }
+                        };
+                        RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
+                        requestQueue.add(strReq);
+
+
+                    }else{
+                        //no internet
+                        Toast.makeText(MainActivity.this, "Error,check your internet connection and try again", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+        myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        myDialog.show();
     }
 
     //user forgot pass...reset it

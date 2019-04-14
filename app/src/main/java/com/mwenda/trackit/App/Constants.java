@@ -9,5 +9,6 @@ public class Constants {
     public static String UPDATEPASS_URL = "https://evansmwendaem.000webhostapp.com/updatePass.php";
     public static String LOCATE_URL = "https://evansmwendaem.000webhostapp.com/locate.php?limit=1&gsmIMEI=";
     public static String HISTORY_URL = "https://evansmwendaem.000webhostapp.com/locate.php?limit=0&gsmIMEI=";
+    public static String UPDATEIMEI_URL = "https://evansmwendaem.000webhostapp.com/updateIMEI.php";
     public static String GEOCODEAPIKEY = "AIzaSyAwlAjaUKAcEDIyg3tQcCeioLyEGEfSL9c";
 }
