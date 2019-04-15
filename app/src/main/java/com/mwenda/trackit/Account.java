@@ -29,9 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Account extends AppCompatActivity {
-    private String password,ownPhone,gsmPhone="";
+    private String password,ownPhone,gsmPhone,gsmIMEI="";
     public String userName,phoneNum,gsmNum;
-    private EditText txtpassword,txtownPhone,txtgsmPhone;
+    private EditText txtpassword,txtownPhone,txtgsmPhone,txtgsmIMEI;
     ProgressDialog progressDialog;
     SharedPreferences sp;
     @Override
@@ -42,6 +42,7 @@ public class Account extends AppCompatActivity {
         userName=sp.getString("email","");
         phoneNum=sp.getString("phone","");
         gsmNum=sp.getString("gsm","");
+        gsmIMEI=sp.getString("imei","");
 
         //get the fields
         txtpassword=(EditText)findViewById(R.id.editPassword);
@@ -49,6 +50,8 @@ public class Account extends AppCompatActivity {
         txtownPhone.setText(phoneNum);
         txtgsmPhone=(EditText)findViewById(R.id.editgsmPhone);
         txtgsmPhone.setText(gsmNum);
+        txtgsmIMEI=(EditText)findViewById(R.id.editgsmIMEI);
+        txtgsmIMEI.setText(gsmIMEI);
 
     }
     //check if internet is available
@@ -65,9 +68,10 @@ public class Account extends AppCompatActivity {
         password=txtpassword.getText().toString().trim();
         ownPhone=txtownPhone.getText().toString().trim();
         gsmPhone=txtgsmPhone.getText().toString().trim();
+        gsmIMEI=txtgsmIMEI.getText().toString().trim();
 
         //check the fields if empty
-        if(ownPhone.isEmpty() || gsmPhone.isEmpty()){
+        if(ownPhone.isEmpty() || gsmPhone.isEmpty() || gsmIMEI.isEmpty()){
             //one of the above fields is empty..when it should not
             String errorMsg="Error, Please fill all required fields(Phone& GSM)";
             Toast.makeText(Account.this,errorMsg, Toast.LENGTH_LONG).show();
@@ -76,7 +80,7 @@ public class Account extends AppCompatActivity {
             if(password.isEmpty()){
                 //user doesnt want to change password
                 if(checkInternet(this)){
-                    updateUsr(ownPhone,gsmPhone);
+                    updateUsr(ownPhone,gsmPhone,gsmIMEI);
                 }else{
                     //device offline
                     String errorMsg="Error, Please check your internet connection and try again";
@@ -85,7 +89,7 @@ public class Account extends AppCompatActivity {
             }else{
                 //usr wants to change password also
                 if(checkInternet(this)){
-                    updateUsr1(ownPhone,gsmPhone,password);
+                    updateUsr1(ownPhone,gsmPhone,gsmIMEI,password);
                 }else{
                     //device offline
                     String errorMsg="Error, Please check your internet connection and try again";
@@ -95,7 +99,7 @@ public class Account extends AppCompatActivity {
         }
     }
 
-    private void updateUsr(final String ownPhone,final String gsmPhone) {
+    private void updateUsr(final String ownPhone,final String gsmPhone,final String gsmIMEI) {
         progressDialog = new ProgressDialog(Account.this);
         progressDialog.setMessage("Updating Account details ...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -144,6 +148,7 @@ public class Account extends AppCompatActivity {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("ownPhone", ownPhone);
                 params.put("gsmPhone", gsmPhone);
+                params.put("gsmIMEI", gsmIMEI);
                 params.put("email", userName);
                 return params;
             }
@@ -151,7 +156,7 @@ public class Account extends AppCompatActivity {
         RequestQueue requestQueue = Volley.newRequestQueue(Account.this);
         requestQueue.add(strReq);
     }
-    private void updateUsr1(final String ownPhone,final String gsmPhone,final String password) {
+    private void updateUsr1(final String ownPhone,final String gsmPhone,final String gsmIMEI,final String password) {
         progressDialog = new ProgressDialog(Account.this);
         progressDialog.setMessage("Updating Account details ...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -199,6 +204,7 @@ public class Account extends AppCompatActivity {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("ownPhone", ownPhone);
                 params.put("gsmPhone", gsmPhone);
+                params.put("gsmIMEI", gsmIMEI);
                 params.put("password", password);
                 params.put("email", userName);
                 return params;

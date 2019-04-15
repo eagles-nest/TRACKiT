@@ -33,4 +33,5 @@
     <string name="submit">Submit</string>
     <string name="title_activity_locate1">Map</string>
     <string name="imei">Enter GSM IMEI</string>
+    <string name="gsmIMEI">Enter New GSM IMEI (Optional)</string>
 </resources>

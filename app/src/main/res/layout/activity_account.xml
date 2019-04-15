@@ -23,6 +23,7 @@
         android:layout_marginEnd="20dp"
         android:hint="@string/ownPhoneNew"
         android:layout_below="@+id/imageView"/>
+
     <EditText
         android:id="@+id/editgsmPhone"
         android:layout_marginTop="20dp"
@@ -33,6 +34,16 @@
         android:layout_marginEnd="20dp"
         android:hint="@string/gsmPhoneNew"
         android:layout_below="@+id/editownPhone"/>
+    <EditText
+        android:id="@+id/editgsmIMEI"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:hint="@string/gsmIMEI"
+        android:layout_below="@+id/editgsmPhone"/>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/password_text_input_layout"
@@ -40,7 +51,7 @@
         app:passwordToggleEnabled="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editgsmPhone">
+        android:layout_below="@+id/editgsmIMEI">
         <EditText
             android:id="@+id/editPassword"
             android:layout_marginTop="20dp"
