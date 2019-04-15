@@ -40,10 +40,6 @@ public class Homepage extends AppCompatActivity
     private static final int PERMISSION_REQUEST_CODE2 = 201;
     SharedPreferences sp;
     boolean permEnabled=false;
-    String SENT="SMS SENT";
-    String DELIVERED="SMS DELIVERED";
-    PendingIntent sentInt,recvInt;
-    BroadcastReceiver sentReceiver,recvedReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +51,6 @@ public class Homepage extends AppCompatActivity
         sp=getSharedPreferences("login",MODE_PRIVATE);
         gsm=sp.getString("gsm","");
 
-        recvInt=PendingIntent.getBroadcast(this,0,new Intent(DELIVERED),0);
-        sentInt=PendingIntent.getBroadcast(this,0,new Intent(SENT),0);
 
         if(checkPerm()){
             permEnabled=true;
@@ -130,7 +124,6 @@ public class Homepage extends AppCompatActivity
         switch(id){
             case (R.id.nav_locate):
                 //redirect to the location class;
-                sendSMS(gsm);
                 if(checkPerm()){
                     permEnabled=true;
                     if(checkInternet(Homepage.this)){
@@ -251,19 +244,7 @@ public class Homepage extends AppCompatActivity
         Intent intent = new Intent(Homepage.this,Account.class);
         startActivity(intent);
     }
-    private void sendSMS(String recNo){
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.SEND_SMS)
-                    == PackageManager.PERMISSION_DENIED) {
-                Log.d("permission", "permission denied to SEND_SMS - requesting it");
-                String[] permissions = {Manifest.permission.SEND_SMS};
-                requestPermissions(permissions, PERMISSION_REQUEST_CODE);
-            }else{
-                SmsManager sm = SmsManager.getDefault();
-                sm.getSmsManagerForSubscriptionId( 0).sendTextMessage(recNo, null,  "LOCATE", sentInt ,  null);
-            }
-        }
-    }
+
 
     private void logout(){
         //logs user out->destroy saved preferences
@@ -289,53 +270,6 @@ public class Homepage extends AppCompatActivity
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
         return isConnected;
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(recvedReceiver);
-        unregisterReceiver(sentReceiver);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        sentReceiver=new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                switch (getResultCode()){
-                    case (Activity.RESULT_OK):
-                        //Toast.makeText(Homepage.this, "SMS SENT", Toast.LENGTH_SHORT).show();
-                        break;
-                    case (SmsManager.RESULT_ERROR_GENERIC_FAILURE):
-                        SmsManager sm = SmsManager.getDefault();
-                        //sm.sendTextMessage("0720918234", null, "Message", sentInt, null);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                            sm.getSmsManagerForSubscriptionId( 1).sendTextMessage("0720918234", null,  "LOCATE", sentInt ,  null);
-                        }
-                        //Toast.makeText(Homepage.this, "Generic error", Toast.LENGTH_SHORT).show();
-                        break;
-                    case (SmsManager.RESULT_ERROR_NO_SERVICE):
-                        //Toast.makeText(Homepage.this, "NO service", Toast.LENGTH_SHORT).show();
-                        break;
-                    case (SmsManager.RESULT_ERROR_NULL_PDU):
-                        ///Toast.makeText(Homepage.this, "NULL PDU", Toast.LENGTH_SHORT).show();
-                        break;
-                    case (SmsManager.RESULT_ERROR_RADIO_OFF):
-                        //Toast.makeText(Homepage.this, "radio off", Toast.LENGTH_SHORT).show();
-                        break;
-                }
-
-            }
-        };
-        recvedReceiver=new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-            }
-        };
-        registerReceiver(sentReceiver,new IntentFilter(SENT));
-        registerReceiver(recvedReceiver,new IntentFilter(DELIVERED));
     }
 
 

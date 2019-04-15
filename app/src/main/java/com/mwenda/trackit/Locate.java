@@ -247,7 +247,7 @@ public class Locate extends FragmentActivity implements OnMapReadyCallback {
                 });
                 timer2.cancel(); //this will cancel the timer of the system
             }
-        }, 4000);
+        }, 7000);
     }
     //public void onBackPressed
     @Override

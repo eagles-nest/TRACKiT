@@ -118,6 +118,7 @@ public class History extends FragmentActivity implements OnMapReadyCallback {
         pDialog.setCanceledOnTouchOutside(false);
         pDialog.show();
         String url = Constants.HISTORY_URL+gsmIMEI;//get latlon endpoint
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
@@ -243,7 +244,7 @@ public class History extends FragmentActivity implements OnMapReadyCallback {
                 });
                 timer2.cancel(); //this will cancel the timer of the system
             }
-        }, 6000);
+        }, 7000);
     }
 
     //public void onBackPressed
