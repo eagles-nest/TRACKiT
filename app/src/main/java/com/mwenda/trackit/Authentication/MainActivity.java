@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                         gsm = jsonObject1.optString("gsm","");
                         imei = jsonObject1.optString("imei","");
                         user_id = jsonObject1.optString("user_id","");
-                        Toast.makeText(MainActivity.this, ""+imei, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, ""+imei, Toast.LENGTH_SHORT).show();
                         //(true)login successful
                         //store details in SHARED PREFERENCES
 
