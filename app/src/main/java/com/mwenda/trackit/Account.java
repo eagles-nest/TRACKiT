@@ -21,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.mwenda.trackit.App.Constants;
+import com.mwenda.trackit.Authentication.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -116,8 +117,14 @@ public class Account extends AppCompatActivity {
                     boolean status = jsonObject.optBoolean("success", false);
                     String reply = jsonObject.optString("message","");
                     if(status){
+                        //clearSharedPref();
                         progressDialog.dismiss();
                         //TODO ACCOUNT UPDATED SUCCESSFULLY
+                        SharedPreferences.Editor e = sp.edit();
+                        e.putString("phone",ownPhone);
+                        e.putString("gsm",gsmPhone);
+                        e.putString("imei",gsmIMEI);
+                        e.commit();
                         Toast.makeText(Account.this, reply, Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(Account.this,Homepage.class);
                         startActivity(intent);
@@ -174,6 +181,11 @@ public class Account extends AppCompatActivity {
                     if(status){
                         progressDialog.dismiss();
                         //TODO ACCOUNT UPDATED SUCCESSFULLY
+                        SharedPreferences.Editor e = sp.edit();
+                        e.putString("phone",ownPhone);
+                        e.putString("gsm",gsmPhone);
+                        e.putString("imei",gsmIMEI);
+                        e.commit();
                         Toast.makeText(Account.this, reply, Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(Account.this,Homepage.class);
                         startActivity(intent);
@@ -213,4 +225,5 @@ public class Account extends AppCompatActivity {
         RequestQueue requestQueue = Volley.newRequestQueue(Account.this);
         requestQueue.add(strReq);
     }
+
 }
